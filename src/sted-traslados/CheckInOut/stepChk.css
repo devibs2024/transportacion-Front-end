@@ -1,0 +1,9 @@
+.p-steps-title{
+    color: white;
+}
+
+.p-steps .p-steps-item .p-highlight .p-steps-number {
+    background: #000000;
+    color: #ffffff !important;
+}
+

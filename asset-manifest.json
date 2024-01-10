@@ -1,0 +1,35 @@
+{
+  "files": {
+    "main.css": "/sted-planning/static/css/main.3943dc3b.css",
+    "main.js": "/sted-planning/static/js/main.c67f0d11.js",
+    "static/js/52.f5da1751.chunk.js": "/sted-planning/static/js/52.f5da1751.chunk.js",
+    "static/js/45.74b809c3.chunk.js": "/sted-planning/static/js/45.74b809c3.chunk.js",
+    "static/js/802.9b4f45b5.chunk.js": "/sted-planning/static/js/802.9b4f45b5.chunk.js",
+    "static/js/498.2bbc5f4d.chunk.js": "/sted-planning/static/js/498.2bbc5f4d.chunk.js",
+    "static/js/703.c47a2a48.chunk.js": "/sted-planning/static/js/703.c47a2a48.chunk.js",
+    "static/js/513.bddad9af.chunk.js": "/sted-planning/static/js/513.bddad9af.chunk.js",
+    "static/js/787.180713e2.chunk.js": "/sted-planning/static/js/787.180713e2.chunk.js",
+    "static/media/stedlogo.png": "/sted-planning/static/media/stedlogo.6b925ea36e0350db2165.png",
+    "static/media/primeicons.svg": "/sted-planning/static/media/primeicons.e1441b135b3ca9ad643c.svg",
+    "static/media/primeicons.eot": "/sted-planning/static/media/primeicons.d44157bdfa026dc877af.eot",
+    "static/media/primeicons.woff": "/sted-planning/static/media/primeicons.10d3152104f2208ac82a.woff",
+    "static/media/primeicons.ttf": "/sted-planning/static/media/primeicons.ea5358601d0a3fd6670b.ttf",
+    "static/media/primeicons.woff2": "/sted-planning/static/media/primeicons.78172950b335ccdb94e2.woff2",
+    "static/media/logofa.png": "/sted-planning/static/media/logofa.45e4aff5788a92bba9d9.png",
+    "static/media/color.png": "/sted-planning/static/media/color.6441e63a57ccc5105bad.png",
+    "index.html": "/sted-planning/index.html",
+    "main.3943dc3b.css.map": "/sted-planning/static/css/main.3943dc3b.css.map",
+    "main.c67f0d11.js.map": "/sted-planning/static/js/main.c67f0d11.js.map",
+    "52.f5da1751.chunk.js.map": "/sted-planning/static/js/52.f5da1751.chunk.js.map",
+    "45.74b809c3.chunk.js.map": "/sted-planning/static/js/45.74b809c3.chunk.js.map",
+    "802.9b4f45b5.chunk.js.map": "/sted-planning/static/js/802.9b4f45b5.chunk.js.map",
+    "498.2bbc5f4d.chunk.js.map": "/sted-planning/static/js/498.2bbc5f4d.chunk.js.map",
+    "703.c47a2a48.chunk.js.map": "/sted-planning/static/js/703.c47a2a48.chunk.js.map",
+    "513.bddad9af.chunk.js.map": "/sted-planning/static/js/513.bddad9af.chunk.js.map",
+    "787.180713e2.chunk.js.map": "/sted-planning/static/js/787.180713e2.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.3943dc3b.css",
+    "static/js/main.c67f0d11.js"
+  ]
+}
