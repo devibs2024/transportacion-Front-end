@@ -1,20 +1,20 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getEmpleadoCoordinador } from "./thunks/empleadoCoordinadorThunks";
+import { getEmpleadoCoordinadores } from "./thunks/empleadoCoordinadorThunks";
 
 const empleadoCoordinadorSlice = createSlice({
-    name: "EmpleadoCoordinador",
+    name: "empleadoCoordinador",
     initialState: {
-        empleadoCoordinador: [],
+        empleadoCoordinadores: [],
         loading: false,
         error: "",
     },
     extraReducers: (builder) => {
         builder
-            .addCase(getEmpleadoCoordinador.fulfilled, (state, action) => {
+            .addCase(getEmpleadoCoordinadores.fulfilled, (state, action) => {
                 state.loading = false;
-                state.empleadoCoordinador = action.payload.empleadoCoordinador;
+                state.empleadoCoordinadores = action.payload.empleadoCoordinadores;
             })
-            .addCase(getEmpleadoCoordinador.rejected, (state, action) => {
+            .addCase(getEmpleadoCoordinadores.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             });

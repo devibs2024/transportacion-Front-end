@@ -36,7 +36,7 @@ export const FormularioNuevaPlanificacion = ({ setPlanificacion, planificacion }
         fechaDesde: Yup.date()
             .min(new Date(), "La fecha de inicio debe ser mayor a la fecha actual")
             .required('La fecha de inicio es requerida'),
-        FrecuenciaId: Yup.number().required('La frecuencia es requerida'),
+        frecuenciaId: Yup.number().required('La frecuencia es requerida'),
         fechaHasta: Yup.date()
             .required('La fecha final es requerida')
     });
@@ -58,7 +58,8 @@ export const FormularioNuevaPlanificacion = ({ setPlanificacion, planificacion }
                 fechaDesde: location.state.planificacion.fechaDesde,
                 fechaHasta: location.state.planificacion.fechaHasta,
                 comentario: location.state.planificacion.comentario,
-                idCoordinador: location.state.planificacion.idCoordinador
+                idCoordinador: location.state.planificacion.idCoordinador,
+                frecuenciaId: location.state.planificacion.frecuenciaId
             })
 
             setIdPlanificacion(location.state.planificacion.idPlanificacion);
@@ -68,9 +69,12 @@ export const FormularioNuevaPlanificacion = ({ setPlanificacion, planificacion }
                 fechaDesde: location.state.planificacion.fechaDesde,
                 fechaHasta: location.state.planificacion.fechaHasta,
                 comentario: location.state.planificacion.comentario,
-                idCoordinador: location.state.planificacion.idCoordinador
+                idCoordinador: location.state.planificacion.idCoordinador,
+                frecuenciaId: location.state.planificacion.frecuenciaId
             })
-        } else if (planificacion.idPlanificacion != 0) {
+
+        } 
+        else if (planificacion.idPlanificacion != 0) {
             formik.setValues(planificacion)
         }
 
@@ -87,8 +91,10 @@ export const FormularioNuevaPlanificacion = ({ setPlanificacion, planificacion }
             fechaDesde: '',
             fechaHasta: '',
             comentario: '',
-            idCoordinador: 0
+            idCoordinador: 0,
+            frecuenciaId: 0
         });
+        
     }
 
     const getInitialValues = () => {
@@ -97,7 +103,7 @@ export const FormularioNuevaPlanificacion = ({ setPlanificacion, planificacion }
             fechaHasta: '',
             comentario: '',
             idCoordinador: 0,
-            FrecuenciaId: ''
+            frecuenciaId: 0
         }
     }
 
@@ -111,7 +117,8 @@ export const FormularioNuevaPlanificacion = ({ setPlanificacion, planificacion }
                 fechaDesde: values.fechaDesde,
                 fechaHasta: values.fechaHasta,
                 comentario: values.comentario,
-                idCoordinador: values.idCoordinador
+                idCoordinador: values.idCoordinador,
+                frecuenciaId: values.frecuenciaId
             }
 
             putOrPostPlanificacion(nuevaPlanificacion);
@@ -142,32 +149,25 @@ export const FormularioNuevaPlanificacion = ({ setPlanificacion, planificacion }
 
                     console.log(response.data)
                     setIdPlanificacion(response.data);
-
-                    updatePlanificacion({
-                        idPlanificacion: response.data
-                    })
-
+                    updatePlanificacion({ idPlanificacion: response.data })
                     accionExitosa({ titulo: 'Planificación Agregada', mensaje: ' ¡La Planificación fue agregada satisfactoriamente!' });
                 }
 
-            } else {
+            } 
+            else {
 
                 console.log(planificacion)
-
                 response = await API.put(`Planificaciones/${idPlanificacion}`, planificacion);
 
                 if (response.status == 200 || response.status == 204) {
-
+                    updatePlanificacion({ idPlanificacion: response.data })
                     accionExitosa({ titulo: 'Planificacion Actualizada', mensaje: '¡La Planificación ha sido actualizada satisfactoriamente!' });
-
-                    updatePlanificacion({
-                        idPlanificacion: response.data
-                    })
-                }
             }
 
-        } catch (e) {
+            }
 
+        } 
+        catch (e) {
             accionFallida({ titulo: 'Ha Ocurrido un errror', mensaje: procesarErrores(e.response.data) })
         }
     }
@@ -241,10 +241,10 @@ export const FormularioNuevaPlanificacion = ({ setPlanificacion, planificacion }
                         name="comentario"
                         error={formik.touched.comentario && formik.errors.comentario ? (<div className="text-danger">{formik.errors.comentario}</div>) : null} />
                  <div className='col col-sm-6 mt-1'>
-                 <Form.Group controlId="FrecuenciaId">
+                 <Form.Group controlId="frecuenciaId">
                         <Form.Label>Frecuencia:</Form.Label>
                         <Form.Control as="select"
-                            value={formik.values.FrecuenciaId}
+                            value={formik.values.frecuenciaId}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}>
                             <option value="">Seleccione la frecuencia</option>
@@ -252,7 +252,7 @@ export const FormularioNuevaPlanificacion = ({ setPlanificacion, planificacion }
                             <option value="2">Quincenal</option>
                         </Form.Control>
                         <Form.Text className="text-danger">
-                            {formik.touched.FrecuenciaId && formik.errors.FrecuenciaId ? (<div className="text-danger">{formik.errors.FrecuenciaId}</div>) : null}
+                            {formik.touched.frecuenciaId && formik.errors.frecuenciaId ? (<div className="text-danger">{formik.errors.frecuenciaId}</div>) : null}
                         </Form.Text>
                     </Form.Group>
                  </div>

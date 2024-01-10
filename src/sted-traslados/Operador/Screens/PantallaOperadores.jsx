@@ -37,7 +37,7 @@ export const PantallaOperador = () => {
 
     const geOperadores = async () => {
 
-        const response = await API.get(`Operador`);
+        const response = await API.get('Operador');
 
         if (response.status == 200 || response.status == 204) {
 

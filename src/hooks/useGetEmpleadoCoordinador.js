@@ -1,15 +1,15 @@
 import { useDispatch, useSelector } from "react-redux";
+import { getEmpleadoCoordinadores } from "../store/slices/thunks/empleadoCoordinadorThunks";
 import { useEffect } from "react";
-import { getEmpleadoCoordinador } from "../store/slices/thunks/empleadoCoordinadorThunks";
 
-export const useGetEmpleadoCoordinador = () => {
+export const useGetEmpleadoCoordinadores = () => {
 
     const dispatch = useDispatch();
 
-    const empleadoCoordinadores = useSelector((store) => store.empleadoCoordinadores.empleadoCoordinadores);
+    const empleadoCoordinadores = useSelector((store) => store.empleadoCoordinador.empleadoCoordinadores);
 
     useEffect(() => {
-        dispatch(getEmpleadoCoordinador());
+        dispatch(getEmpleadoCoordinadores());
     }, []);
 
     return empleadoCoordinadores;

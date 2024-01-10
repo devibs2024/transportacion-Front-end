@@ -13,7 +13,6 @@ export const CardDetallePlanificacion = ({ setPlanificacion, planificacion }) =>
     const [detallePlanificacion, setDetallePlanificacion] = useState({});
     const [detallesGeneralesPlanificacion, setDetallesGeneralesPlanificacion] = useState([]);
 
-
     const [detallesPlanificacion, setDetallesPlanificacion] = useState([]);
 
     useEffect(() => {

@@ -23,20 +23,15 @@ import withReactContent from "sweetalert2-react-content";
 import * as Yup from "yup";
 import { accionFallida } from "../../../shared/Utils/modals";
 import { procesarErrores } from "../../../shared/Utils/procesarErrores";
-import { useGetEmpleadoCoordinador } from "../../../hooks/useGetEmpleadoCoordinador";
-
 
 export const PantallaDetalleNomina = ({ setOperador, operador}) => {
 
     const [productividades, setProductividades] = useState([]);
     const [idOperador, setIdOperador] = useState(0);    
-    //const [operador, setOperador] = useState();
     const MySwal = withReactContent(Swal);
     const navigate = useNavigate();
     const location = useLocation();
     
-    const [operadoresOptions, setOperadoresOptions] = useState([]);    
-    const [tiendaOptions, setTiendasOptions] = useState([]);
     const [calculonomina, setCalculoNomina] = useState([]);        
 
     const idCoordinador = decodeToken.tokenDecode();
@@ -45,15 +40,13 @@ export const PantallaDetalleNomina = ({ setOperador, operador}) => {
         if (location.state?.operador){
 
             formik.setValues(location.state.operador)
-
             setIdOperador(location.state.operador.idOperador);
-            // setOperador(location.state.operador);
-        } else if (operador.idOperador != 0){
+        } 
+        else if (operador.idOperador != 0){
             formik.setValues(operador)
         }
     }, []);
         
-
     const cols = [
         { field: 'idPlanificacion', header: 'Id Secuencia'},
         { field: 'nombreCoordinador', header: 'Coordinador'},        
@@ -78,6 +71,33 @@ export const PantallaDetalleNomina = ({ setOperador, operador}) => {
 
     const exportColumns = cols.map((col) => ({ title: col.header, datakey: col.field }));
 
+    //OPERADORES ASIGNADOS AL COORDINADOR
+    const [operadoresOptions, setOperadoresOptions] = useState([]); 
+    const getEmpleadoCoordinador = async (idCoordinador) => {
+        const response = await API.get(`EmpleadoCoordinador/${idCoordinador}`);
+        if (response.status == 200 || response.status == 204) {
+            let data = response.data.map((data) => ({
+                value: data.idOperador,
+                label: data.nombres
+            }));
+            setOperadoresOptions(data)
+        }
+    }
+    getEmpleadoCoordinador(idCoordinador);
+
+    //SUCURSALES ASIGNADAS AL COORDINADOR
+    const [tiendaOptions, setTiendasOptions] = useState([]);
+    const getTiendaCoordinador = async (idCoordinador) => {
+        const response = await API.get(`TiendaCoordinador/${idCoordinador}`);
+        if (response.status == 200 || response.status == 204) {
+            let data = response.data.map((data) => ({
+                value: data.idTienda,
+                label: data.nombreTienda
+            }));
+            setTiendasOptions(data)
+        }
+    }
+    getTiendaCoordinador(idCoordinador)
     
     const formatDateToYYYYMMDD = (date) => {
         const year = date.getFullYear();
@@ -87,11 +107,6 @@ export const PantallaDetalleNomina = ({ setOperador, operador}) => {
         return `${year}-${month}-${day}`;
     }
     
-    // const optionsOperadores = useGetEmpleadoCoordinador().map((operador) => ({
-    //     value: operador.idOperador,
-    //     label: operador.nombreOperador,
-    // }));
-                
     const [filters, setFilters] = useState({
         global: { value: null, matchMode: FilterMatchMode.CONTAINS},
         idPlanificacion: { value: null, matchMode: FilterMatchMode.STARTS_WITH},
@@ -102,14 +117,11 @@ export const PantallaDetalleNomina = ({ setOperador, operador}) => {
         zonasted: { value: null, matchMode: FilterMatchMode.STARTS_WITH}
     });    
 
+
     const [globalFilterValue, setGlobalFilterValue] = useState('');
-
     const onGlobalFilterChange = (e) => {
-
         const value = e.target.value;
-
         let _filters = { ...filters };
-
         setFilters(_filters);
         setGlobalFilterValue(value);
     };
@@ -124,25 +136,18 @@ export const PantallaDetalleNomina = ({ setOperador, operador}) => {
             banco: { value: null, matchMode: FilterMatchMode.STARTS_WITH},
             zonasted: { value: null, matchMode: FilterMatchMode.STARTS_WITH}
         });
-
         setGlobalFilterValue('')
     };
         
     const onChangeOperador = (event) => {
-
         formik.handleChange(event);
-
-        const idOperador = document.getElementById('IdOperador').value;
-
+        const idOperador = document.getElementById('idOperador').value;
         console.log(idOperador)        
     }
 
     const onChangeTienda = (event) => {
-
         formik.handleChange(event);
-
-        const idTienda = document.getElementById('IdTienda').value;
-
+        const idTienda = document.getElementById('idTienda').value;
         console.log(idTienda)
     }    
 
@@ -214,15 +219,16 @@ export const PantallaDetalleNomina = ({ setOperador, operador}) => {
     
     const getInitialValues = () => {
         return{
+            idCoordinador: 0,
             idOperador: 0,
             nombreOperador: '',
             idTienda: 0,
             nombreTienda: '',
-            idCoordinador: 0,
-            fecha: '',
+            fechaDesde: '',
             fechaHasta: ''
         }
     }
+
     const formik = useFormik({
         initialValues: getInitialValues(),
         validationSchema: Yup.object().shape({
@@ -231,20 +237,32 @@ export const PantallaDetalleNomina = ({ setOperador, operador}) => {
         }),
         Form,
         onSubmit: values => {
+            
             let operador = {
                 idOperador: idOperador,
+                idCoordinador: idCoordinador,
                 nombreOperador: values.nombreOperador,
                 idTienda: values.idTienda,
                 nombreTienda: values.nombreTienda,
-                idCoordinador: idCoordinador,
-                fecha: values.fecha,
+                fechaDesde: values.fechaDesde,
                 fechaHasta: values.fechaHasta,
             };
             
             console.log(operador);
+            getCalculoNomina(operador);
+
         },
     });
     
+    const getCalculoNomina = async (operador) => {
+
+        const response = await API.get(`GetCalculoNomina/${date(operador.fechaDesde)},${date(operador.fechaHasta)}, ${Number(operador.idCoordinador)}, ${Number(operador.idTienda)}`);
+
+        if (response.status == 200 || response.status == 204) {
+            setCalculoNomina(response.data);
+        }
+    }
+
     const leftToolbarTemplate = () => {
         return(
             <div className='flex flex-wrap gap-2'>
@@ -252,7 +270,7 @@ export const PantallaDetalleNomina = ({ setOperador, operador}) => {
                     <Form.Label>Operador:</Form.Label>
                     <Form.Control as="select" 
                         value={formik.values.idOperador}
-                        onChange={onChangeOperador}
+                        onChange={formik.handleChange}
                         onBlur={formik.handleBlur} >
                             <option value="">Seleccione un Operador</option>
                             {operadoresOptions.map((option) => (
@@ -268,11 +286,14 @@ export const PantallaDetalleNomina = ({ setOperador, operador}) => {
                 <br></br>                
                 <Form.Group controlId="idTienda">
                     <Form.Label>Sucursal:</Form.Label>
-                    <Form.Control as = "select" value={formik.values.idTienda} onChange={formik.handleChange} onBlur={formik.handleBlur}>
-                        <option value="">Seleccione Sucursal</option>
+                    <Form.Control as = "select" 
+                        value={formik.values.idTienda} 
+                        onChange={formik.handleChange} 
+                        onBlur={formik.handleBlur}>
+                        <option value="">Seleccione la Sucursal</option>
                         {tiendaOptions.map((option) =>(
                             <option key={option.value} value={option.value}>
-                                {option.value}
+                                {option.label}
                             </option>
                         ))}
                     </Form.Control>
@@ -281,18 +302,18 @@ export const PantallaDetalleNomina = ({ setOperador, operador}) => {
                     </Form.Text>
                 </Form.Group>
                 <br></br>                
-                <Form.Group controlId="fecha">
+                <Form.Group controlId="fechaDesde">
                     <Form.Label>Fecha:</Form.Label>
-                    <DatePicker id="fecha" name="fecha" autoComplete="off" style={{width: "63%"}}
-                        selected={formik.values.fecha ? new Date(formik.values.fecha) : null}
-                        onChange={(date) => formik.setFieldValue('fecha',date)}
+                    <DatePicker id="fechaDesde" name="fechaDesde" autoComplete="off" style={{width: "63%"}}
+                        selected={formik.values.fechaDesde ? new Date(formik.values.fechaDesde) : null}
+                        onChange={(date) => formik.setFieldValue('fechaDesde',date)}
                         onBlur={formik.handleBlur}
                         showMonthDropdown
                         showYearDropdown
                         className='form-control'                            
                     >                        
                     </DatePicker>
-                    {formik.touched.fecha && formik.errors.fecha ? (<Form.Text className="text-danger">{formik.errors.fecha}</Form.Text>) : null}
+                    {formik.touched.fechaDesde && formik.errors.fechaDesde ? (<Form.Text className="text-danger">{formik.errors.fechaDesde}</Form.Text>) : null}
                 </Form.Group>                              
                 <Form.Group controlId="fechaHasta">
                     <Form.Label>Fecha Hasta:</Form.Label>
