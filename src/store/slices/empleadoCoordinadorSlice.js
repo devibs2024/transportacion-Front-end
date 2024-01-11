@@ -1,12 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getEmpleadoCoordinadores } from "./thunks/empleadoCoordinadorThunks";
+import { getEmpleadoCoordinadores } from "./thunks/empleadoCoordinadorThunk";
 
 const empleadoCoordinadorSlice = createSlice({
-    name: "empleadoCoordinador",
+    name: "empleadoCoordinadores",
     initialState: {
-        empleadoCoordinadores: [],
-        loading: false,
+        empleadoCoordinadores: [],        
         error: "",
+        loading: false,
     },
     extraReducers: (builder) => {
         builder

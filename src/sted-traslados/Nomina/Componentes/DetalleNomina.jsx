@@ -24,6 +24,8 @@ import * as Yup from "yup";
 import { accionExitosa, accionFallida } from '../../../shared/Utils/modals';
 import { procesarErrores } from "../../../shared/Utils/procesarErrores";
 
+import { useGetEmpleadoCoordinadores } from "../../../hooks/useGetEmpleadoCoordinador";
+
 export const PantallaDetalleNomina = ({ setOperador, operador }) => {
 
     const [formState, setFormState] = useState(true);
@@ -72,19 +74,11 @@ export const PantallaDetalleNomina = ({ setOperador, operador }) => {
     const dt = useRef(null);
 
     const exportColumns = cols.map((col) => ({ title: col.header, datakey: col.field }));
-
-    //OPERADORES ASIGNADOS AL COORDINADOR
-    const [operadoresOptions, setOperadoresOptions] = useState([]);
-    const getEmpleadoCoordinador = async (idCoordinador) => {
-        const response = await API.get(`EmpleadoCoordinador/${idCoordinador}`);
-        if (response.status == 200 || response.status == 204) {
-            let data = response.data.map((data) => ({
-                value: data.idOperador,
-                label: data.nombres
-            }));
-            setOperadoresOptions(data)
-        }
-    }
+ 
+    const operadoresOptions = useGetEmpleadoCoordinadores(idCoordinador).map((list) => ({
+        value: list.idOperador,
+        label: list.nombres,
+      }));
 
     //SUCURSALES ASIGNADAS AL COORDINADOR
     const [tiendasOptions, setTiendasOptions] = useState([]);
@@ -138,21 +132,7 @@ export const PantallaDetalleNomina = ({ setOperador, operador }) => {
         setGlobalFilterValue('')
     };
 
-    const onChangeOperador = (event) => {
-        formik.handleChange(event);
-        const idOperador = document.getElementById('idOperador').value;
-        console.log(idOperador)
-    }
-
-    const onChangeTienda = (event) => {
-        formik.handleChange(event);
-        const idTienda = document.getElementById('idTienda').value;
-        console.log(idTienda)
-    }
-
     const clearFilter = () => {
-        getEmpleadoCoordinador(idCoordinador);
-        getTiendaCoordinador(idCoordinador)
         initFilters();
     }
 
@@ -218,6 +198,14 @@ export const PantallaDetalleNomina = ({ setOperador, operador }) => {
         });
     };
 
+    // const getCombos = () => {
+
+    //     //### COMBOS
+    //     getEmpleadoCoordinador(idCoordinador);
+    //     getTiendaCoordinador(idCoordinador);
+
+    // }
+
     const getInitialValues = () => {
 
         return {
@@ -241,8 +229,6 @@ export const PantallaDetalleNomina = ({ setOperador, operador }) => {
         Form,
         onSubmit: values => {
 
-            console.log("AA")
-
             let operador = {
                 idCoordinador: idCoordinador,
                 idOperador: values.idOperador,
@@ -252,8 +238,6 @@ export const PantallaDetalleNomina = ({ setOperador, operador }) => {
                 fechaDesde: values.fechaDesde,
                 fechaHasta: values.fechaHasta
             };
-
-            console.log("BB")
 
             getCalculoNomina(operador);
 
@@ -281,86 +265,106 @@ export const PantallaDetalleNomina = ({ setOperador, operador }) => {
 
     const leftToolbarTemplate = () => {
         return (
-            <div className='flex flex-wrap gap-2'>
 
-                <Form onSubmit={formik.handleSubmit}>
+            <Form onSubmit={formik.handleSubmit}>
 
-                    <Form.Group controlId="idOperador">
-                        <Form.Label>Operador:</Form.Label>
-                        <Form.Control as="select"
-                            value={formik.values.idOperador}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur} >
-                            <option value="">Seleccione un Operador</option>
-                            {operadoresOptions.map((option) => (
-                                <option key={option.value} value={option.value}>
-                                    {option.label}
-                                </option>
-                            ))}
-                        </Form.Control>
-                        <Form.Text className="text-danger">
-                            {formik.touched.idOperador && formik.errors.idOperador ? (<div className="text-danger">{formik.errors.idOperador}</div>) : null}
-                        </Form.Text>
-                    </Form.Group>
+                <div className='flex flex-wrap gap-2'>
 
-                    <Form.Group controlId="idTienda">
-                        <Form.Label>Sucursal:</Form.Label>
-                        <Form.Control as="select"
-                            value={formik.values.idTienda}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}>
-                            <option value="">Seleccione la Sucursal</option>
-                            {tiendasOptions.map((option) => (
-                                <option key={option.value} value={option.value}>
-                                    {option.label}
-                                </option>
-                            ))}
-                        </Form.Control>
-                        <Form.Text className="text-danger">
-                            {formik.touched.idTienda && formik.errors.idTienda ? (<div className="text-danger">{formik.errors.idTienda}</div>) : null}
-                        </Form.Text>
-                    </Form.Group>
+                    <div className='col col-sm-3'>
+                        <Form.Group controlId="idOperador">
+                            <Form.Label>Operador:</Form.Label>
+                            <Form.Control as="select" value={formik.values.idOperador} onChange={formik.handleChange} onBlur={formik.handleBlur} >
+                                <option value="">Seleccione un Operador</option>
+                                {
+                                    operadoresOptions.map((option) => (
+                                        <option key={option.value} value={option.value}>
+                                            {option.label}
+                                        </option>
+                                    ))
+                                }
+                            </Form.Control>
+                            <Form.Text className="text-danger">
+                                {formik.touched.idOperador && formik.errors.idOperador ? (<div className="text-danger">{formik.errors.idOperador}</div>) : null}
+                            </Form.Text>
+                        </Form.Group>
+                    </div>
 
-                    <Form.Group controlId="fechaDesde">
-                        <Form.Label>Fecha:</Form.Label>
-                        <DatePicker id="fechaDesde" name="fechaDesde" autoComplete="off" style={{ width: "63%" }}
-                            selected={formik.values.fechaDesde ? new Date(formik.values.fechaDesde) : null}
-                            onChange={(date) => formik.setFieldValue('fechaDesde', date)}
-                            onBlur={formik.handleBlur}
-                            showMonthDropdown
-                            showYearDropdown
-                            className='form-control'
+                    <br />
+
+                    <div className='col col-sm-3'>
+                        <Form.Group controlId="idTienda">
+                            <Form.Label>Sucursal:</Form.Label>
+                            <Form.Control as="select" value={formik.values.idTienda} onChange={formik.handleChange} onBlur={formik.handleBlur}>
+                                <option value="">Seleccione la Sucursal</option>
+                                {
+                                    tiendasOptions.map((option) => (
+                                        <option key={option.value} value={option.value}>
+                                            {option.label}
+                                        </option>
+                                    ))
+                                }
+                            </Form.Control>
+                            <Form.Text className="text-danger">
+                                {formik.touched.idTienda && formik.errors.idTienda ? (<div className="text-danger">{formik.errors.idTienda}</div>) : null}
+                            </Form.Text>
+                        </Form.Group>
+                    </div>
+
+                    <br />
+
+                    <div className='col col-sm-2'>
+                        <Form.Group controlId="fechaDesde">
+                            <Form.Label>Fecha Desde:</Form.Label>
+                            <DatePicker id="fechaDesde" name="fechaDesde" autoComplete="off" style={{ width: "63%" }}
+                                selected={formik.values.fechaDesde ? new Date(formik.values.fechaDesde) : null}
+                                onChange={(date) => formik.setFieldValue('fechaDesde', date)}
+                                onBlur={formik.handleBlur}
+                                showMonthDropdown
+                                showYearDropdown
+                                className='form-control'
+                            >
+                            </DatePicker>
+                            {formik.touched.fechaDesde && formik.errors.fechaDesde ? (<Form.Text className="text-danger">{formik.errors.fechaDesde}</Form.Text>) : null}
+                        </Form.Group>
+                    </div>
+
+                    <br />
+
+                    <div className='col col-sm-2'>
+                        <Form.Group controlId="fechaHasta">
+                            <Form.Label>Fecha Hasta:</Form.Label>
+                            <DatePicker id="fechaHasta" name="fechaHasta" autoComplete="off" style={{ width: "63%" }}
+                                selected={formik.values.fechaHasta ? new Date(formik.values.fechaHasta) : null}
+                                onChange={(date) => formik.setFieldValue('fechaHasta', date)}
+                                onBlur={formik.handleBlur}
+                                showMonthDropdown
+                                showYearDropdown
+                                className='form-control'
+                            >
+                            </DatePicker>
+                            {formik.touched.fechaHasta && formik.errors.fechaHasta ? (<Form.Text className="text-danger">{formik.errors.fechaHasta}</Form.Text>) : null}
+                        </Form.Group>
+                    </div>
+
+                    <br />
+
+                    <div className='col col-sm-6'>
+                        <Button
+                            type="submit"
+                            style={{ backgroundColor: "#2596BE", borderColor: "#2596BE", width: "193px", height: "43px", marginLeft: "0px" }}
+                            label="Genera Cálculo"
+                            icon="pi pi-plus right"
+                            iconPos="right"
                         >
-                        </DatePicker>
-                        {formik.touched.fechaDesde && formik.errors.fechaDesde ? (<Form.Text className="text-danger">{formik.errors.fechaDesde}</Form.Text>) : null}
-                    </Form.Group>
+                        </Button>
+                    </div>
 
-                    <Form.Group controlId="fechaHasta">
-                        <Form.Label>Fecha Hasta:</Form.Label>
-                        <DatePicker id="fechaHasta" name="fechaHasta" autoComplete="off" style={{ width: "63%" }}
-                            selected={formik.values.fechaHasta ? new Date(formik.values.fechaHasta) : null}
-                            onChange={(date) => formik.setFieldValue('fechaHasta', date)}
-                            onBlur={formik.handleBlur}
-                            showMonthDropdown
-                            showYearDropdown
-                            className='form-control'
-                        >
-                        </DatePicker>
-                        {formik.touched.fechaHasta && formik.errors.fechaHasta ? (<Form.Text className="text-danger">{formik.errors.fechaHasta}</Form.Text>) : null}
-                    </Form.Group>
 
-                    <Button
-                        type="submit"
-                        style={{ backgroundColor: "#2596BE", borderColor: "#2596BE", width: "193px", height: "43px", marginLeft: "38px" }}
-                        label="Genera Cálculo"
-                        icon="pi pi-plus right"
-                        iconPos="right"
-                    >
-                    </Button>
 
-                </Form>
+                </div>
 
-            </div>
+            </Form>
+
         )
     }
 
@@ -383,7 +387,7 @@ export const PantallaDetalleNomina = ({ setOperador, operador }) => {
                         paginator rows={5}
                         rowsPerPageOptions={[5, 10, 25]}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} rows"
                         ref={dt}
                         style={customStyle}
                         value={productividades}

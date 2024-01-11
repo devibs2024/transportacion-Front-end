@@ -15,6 +15,7 @@ import { Link } from 'react-router-dom';
 import * as decodeToken from '../../../shared/Utils/decodeToken';
 import { data, event } from 'jquery';
 
+
 export const PantallaNomina = () => {
 
     const [productividades, setProductividades] = useState([]);
@@ -183,7 +184,7 @@ export const PantallaNomina = () => {
                     <Toolbar className="mb-4" right={rightToolbarTemplate}></Toolbar>
                     <DataTable paginator rows={5} rowsPerPageOptions={[5, 10, 25]}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products" ref={dt} style={customStyle} value={productividades} dataKey="idEmpleado" filters={filters} filterDisplay="row"
+                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} rows" ref={dt} style={customStyle} value={productividades} dataKey="idEmpleado" filters={filters} filterDisplay="row"
                         globalFilterFields={['idSecuencia', 'coordinador', 'inicio', 'final', 'frecuencia', 'estado']} header={header} emptyMessage="No data found.">
                         <Column
                             field="idPlanificacion"

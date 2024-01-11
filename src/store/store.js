@@ -1,4 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
+
 import operadorReducer from "./slices/operadorSlice";
 import authReducer from './slices/auth';
 import estadoReducer from './slices/estadoSlice';
@@ -30,7 +31,7 @@ const reducers = {
   modeloVehiculo: modeloReducer,
   coordinador: coordinadorReducer,
   tienda: tiendaReducer,
-  empleado: empleadoCoordinadorReducer
+  empleadoCoordinador: empleadoCoordinadorReducer
 };
 
 export const store = configureStore({
