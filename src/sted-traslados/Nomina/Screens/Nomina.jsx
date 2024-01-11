@@ -109,8 +109,6 @@ export const PantallaNomina = () => {
         );
     };
 
-
-
     const header = renderHeader();
 
     const customStyle = {
@@ -192,7 +190,6 @@ export const PantallaNomina = () => {
                             header="ID de Secuencia"
                             body={(rowData) => {
                                 const idWithPadding = String(rowData.idPlanificacion).padStart(6, '0');
-                             
                                 return <a onClick={() => navigate(`${rutaServidor}/Nomina/Componentes/DetalleNomina`, {state: {operador: rowData}})} style={{ color: '#007bff', cursor: 'pointer' }}>{idWithPadding}</a>
                             }}
                             filter

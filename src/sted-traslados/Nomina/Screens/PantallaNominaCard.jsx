@@ -5,11 +5,13 @@ import { TabView, TabPanel } from "primereact/tabview";
 export const PantallaNominaCard = () => {
 
     const [ operador, setOperador] = useState({
+        idCoordinador: 0,
         idOperador: 0,
         nombreOperador: '',
         idTienda: 0,
         nombreTienda: '',
-        idCoordinador: 0,
+        fechaDesde: '',
+        fechaHasta: ''       
     });
 
     return (
