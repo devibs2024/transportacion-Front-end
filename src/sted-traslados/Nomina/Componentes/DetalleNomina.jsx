@@ -376,10 +376,10 @@ export const PantallaDetalleNomina = ({ setOperador, operador }) => {
                         header={header}
                         emptyMessage="No data found.">
                         <Column field="coordinador" header="Coordinador" filter filterPlaceholder="Buscar por coordinador" style={{ minWidth: '12rem' }}></Column>                        
-                        <Column field="tienda" header="Tienda" filter filterPlaceholder="Buscar por coordinador" style={{ minWidth: '12rem' }}></Column>                        
-                        <Column field="zonaSted" header="ZonaSted" filter filterPlaceholder="Buscar por coordinador" style={{ minWidth: '12rem' }}></Column>                        
-                        <Column field="operador" header="Operador" filter filterPlaceholder="Buscar por coordinador" style={{ minWidth: '12rem' }}></Column>                        
-                        <Column field="banco" header="Banco" filter filterPlaceholder="Buscar por coordinador" style={{ minWidth: '12rem' }}></Column>                        
+                        <Column field="tienda" header="Tienda" filter filterPlaceholder="Buscar por tienda" style={{ minWidth: '12rem' }}></Column>                        
+                        <Column field="zonaSted" header="ZonaSted" filter filterPlaceholder="Buscar por zonasted" style={{ minWidth: '12rem' }}></Column>                        
+                        <Column field="operador" header="Operador" filter filterPlaceholder="Buscar por operador" style={{ minWidth: '12rem' }}></Column>                        
+                        <Column field="banco" header="Banco" filter filterPlaceholder="Buscar por banco" style={{ minWidth: '12rem' }}></Column>                        
                     </DataTable>
                 </div>
             </CustomCard>
