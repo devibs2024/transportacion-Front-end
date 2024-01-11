@@ -32,7 +32,6 @@ export const PantallaDetalleNomina = ({ setOperador, operador }) => {
     const [formState, setFormState] = useState(true);
     const [error, setError] = useState(null);
 
-    const [productividades, setProductividades] = useState([]);
     const [idOperador, setIdOperador] = useState(0);
     const MySwal = withReactContent(Swal);
     const navigate = useNavigate();
@@ -53,23 +52,22 @@ export const PantallaDetalleNomina = ({ setOperador, operador }) => {
     }, []);
 
     const cols = [
-        { field: 'idPlanificacion', header: 'Id Secuencia' },
-        { field: 'nombreCoordinador', header: 'Coordinador' },
-        { field: 'nombreTienda', header: 'Tienda' },
-        { field: 'nombreOperador', header: 'Operador' },
-        { field: 'banco', header: 'Banco' },
-        { field: 'zonaSted', header: 'zonaSted' },
-        { field: 'Dias', header: 'Dias' },
-        { field: 'subtotal', header: 'subtotal' },
-        { field: 'minutosretardo', header: 'minutosretardo' },
-        { field: 'descuentominutos', header: 'descuentominutos' },
-        { field: 'descuentosted', header: 'descuentosted' },
-        { field: 'dias', header: 'dias' },
-        { field: 'gasolina', header: 'gasolina' },
-        { field: 'bonos', header: 'bonos' },
-        { field: 'totalpagar', header: 'totalpagar' },
-        { field: 'pagosmg', header: 'pagosmg' },
-        { field: 'totalfinal', header: 'totalfinal' },
+        { field: 'IdPlanificacion', header: 'Id Secuencia' },
+        { field: 'IdCoordinador', header: 'Id Secuencia' },
+        { field: 'Coordinador', header: 'Coordinador' },        
+        { field: 'IdOperador', header: 'Operador' },
+        { field: 'Operador', header: 'Operador' },
+        { field: 'Banco', header: 'Banco' },
+        { field: 'IdTienda', header: 'Tienda' },
+        { field: 'Tienda', header: 'Tienda' },
+        { field: 'ZonaSted', header: 'ZonaSted' },
+        { field: 'SubTotal', header: 'SubTotal' },
+        { field: 'MinutosRetardo', header: 'MinutosRetardo' },
+        { field: 'DescuentoRetardo', header: 'DescuentoRetardo' },
+        { field: 'DescuentoSted', header: 'DescuentoSted' },
+        { field: 'Gasolina', header: 'Gasolina' },
+        { field: 'PagoSMG', header: 'PagoSMG' },
+        { field: 'TotalPagar', header: 'TotalPagar' },
     ];
 
     const dt = useRef(null);
@@ -90,11 +88,11 @@ export const PantallaDetalleNomina = ({ setOperador, operador }) => {
     const [filters, setFilters] = useState({
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         idPlanificacion: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        nombreOperador: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        nombreCoordinador: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        nombreTienda: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        banco: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        zonasted: { value: null, matchMode: FilterMatchMode.STARTS_WITH }
+        //nombreOperador: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        //nombreCoordinador: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        //nombreTienda: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        //banco: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        //zonasted: { value: null, matchMode: FilterMatchMode.STARTS_WITH }
     });
 
     const [globalFilterValue, setGlobalFilterValue] = useState('');
@@ -109,11 +107,11 @@ export const PantallaDetalleNomina = ({ setOperador, operador }) => {
         setFilters({
             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
             idPlanificacion: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-            nombreOperador: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-            nombreCoordinador: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-            nombreTienda: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-            banco: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-            zonasted: { value: null, matchMode: FilterMatchMode.STARTS_WITH }
+            //nombreOperador: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+            //nombreCoordinador: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+            //nombreTienda: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+            //banco: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+            //zonasted: { value: null, matchMode: FilterMatchMode.STARTS_WITH }
         });
         setGlobalFilterValue('')
     };
@@ -184,14 +182,6 @@ export const PantallaDetalleNomina = ({ setOperador, operador }) => {
         });
     };
 
-    // const getCombos = () => {
-
-    //     //### COMBOS
-    //     getEmpleadoCoordinador(idCoordinador);
-    //     getTiendaCoordinador(idCoordinador);
-
-    // }
-
     const getInitialValues = () => {
 
         return {
@@ -234,18 +224,20 @@ export const PantallaDetalleNomina = ({ setOperador, operador }) => {
 
         try {
 
-            console.log(datos)
-
             const response = await API.get(`CalculoNomina/${datos.fechaDesde},${datos.fechaHasta},${Number(datos.idOperador)},${Number(datos.idTienda)}`);
-            if (response.status == 200 || response.status == 204) {
+
+            console.log(response.data)
+
+            if (response.status == 200 || response.status == 204)                
                 setCalculoNomina(response.data);
-            } else {
+            else 
                 accionFallida({ titulo: 'E R R O R', mensaje: 'NO SE PUDO PROCESAR' });
-            }
 
         } catch (error) {
+
             setError(error.response.data);
             accionFallida({ titulo: 'E R R O R <br/> (INESPERADO)', mensaje: JSON.stringify(error.response.data) });
+        
         }
     }
 
@@ -376,59 +368,18 @@ export const PantallaDetalleNomina = ({ setOperador, operador }) => {
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} rows"
                         ref={dt}
                         style={customStyle}
-                        value={productividades}
+                        value={calculonomina}
                         dataKey="idEmpleado"
                         filters={filters}
                         filterDisplay="row"
                         globalFilterFields={['idSecuencia', 'coordinador', 'operador', 'inicio', 'final']}
                         header={header}
                         emptyMessage="No data found.">
-                        <Column field="idPlanificacion" header="Id Secuencia" filter filterPlaceholder="Buscar por id de secuencia" style={{ minWidth: '12rem' }}></Column>
-                        <Column field="nombreCoordinador" header="Coordinador" filter filterPlaceholder="Buscar por nombre de Coordinador" style={{ minWidth: '12rem' }}></Column>
-                        <Column field="nombreTienda" header="Tienda" filter filterPlaceholder="Buscar por nombre de Tienda" style={{ minWidth: '12rem' }}></Column>
-                        <Column field="nombreOperador" header="Operador" filter filterPlaceholder="Buscar por nombre de Operador" style={{ minWidth: '12rem' }}></Column>
-                        <Column field="banco" header="Banco" filter filterPlaceholder="Buscar por nombre de Banco." style={{ minWidth: '12rem' }}></Column>
-                        <Column field="zonasted" header="Zona Sted" filter filterPlaceholder="Buscar por nombre de Zona Sted" style={{ minWidth: '12rem' }}></Column>
-                        <Column style={{ minWidth: '50rem' }}
-                            header="Días"
-                            body={(rowData) => {
-                                return (
-                                    <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                                        {rowData.dayOptions.map((option, index) => {
-                                            let color, textColor;
-                                            const action = option.action;
-                                            if (action === 'R') {
-                                                color = 'red';
-                                                textColor = 'white';
-                                            } else if (action === 'A') {
-                                                color = 'yellow';
-                                                textColor = 'black';
-                                            } else {
-                                                color = 'white';
-                                                textColor = 'black';
-                                            }
-                                            return (
-                                                <div key={index}
-                                                    style={{ backgroundColor: color, color: textColor, padding: '10px', fontWeight: 'bold', textAlign: 'center', width: '80px', border: '1px solid brown' }}>
-
-                                                </div>
-                                            )
-                                        })}
-                                    </div>
-                                )
-                            }}
-                        >
-                        </Column>
-                        <Column field="subtotal" header="SubTotal" style={{ minWidth: '12rem' }}></Column>
-                        <Column field="minutosretardo" header="Minutos de Retardo" style={{ minWidth: '12rem' }}></Column>
-                        <Column field="descuentominutos" header="Descuento minutos" style={{ minWidth: '12rem' }}></Column>
-                        <Column field="descuentosted" header="Descuento Sted" style={{ minWidth: '12rem' }}></Column>
-                        <Column field="dias" header="Dias" style={{ minWidth: '12rem' }}></Column>
-                        <Column field="gasolina" header="Tarjeta Gasolina" style={{ minWidth: '12rem' }}></Column>
-                        <Column field="bonos" header="Bonos Extra" style={{ minWidth: '12rem' }}></Column>
-                        <Column field="totalpagar" header="Total a Pagar" style={{ minWidth: '12rem' }}></Column>
-                        <Column field="pagosmg" header="Pago SMG" style={{ minWidth: '12rem' }}></Column>
-                        <Column field="totalfinal" header="Total Final" style={{ minWidth: '12rem' }}></Column>
+                        <Column field="coordinador" header="Coordinador" filter filterPlaceholder="Buscar por coordinador" style={{ minWidth: '12rem' }}></Column>                        
+                        <Column field="tienda" header="Tienda" filter filterPlaceholder="Buscar por coordinador" style={{ minWidth: '12rem' }}></Column>                        
+                        <Column field="zonaSted" header="ZonaSted" filter filterPlaceholder="Buscar por coordinador" style={{ minWidth: '12rem' }}></Column>                        
+                        <Column field="operador" header="Operador" filter filterPlaceholder="Buscar por coordinador" style={{ minWidth: '12rem' }}></Column>                        
+                        <Column field="banco" header="Banco" filter filterPlaceholder="Buscar por coordinador" style={{ minWidth: '12rem' }}></Column>                        
                     </DataTable>
                 </div>
             </CustomCard>
