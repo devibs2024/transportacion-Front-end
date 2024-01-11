@@ -25,6 +25,7 @@ import { accionExitosa, accionFallida } from '../../../shared/Utils/modals';
 import { procesarErrores } from "../../../shared/Utils/procesarErrores";
 
 import { useGetEmpleadoCoordinadores } from "../../../hooks/useGetEmpleadoCoordinador";
+import { useGetTiendaCoordinadores } from "../../../hooks/useGetTiendaCoordinador";
 
 export const PantallaDetalleNomina = ({ setOperador, operador }) => {
 
@@ -74,24 +75,9 @@ export const PantallaDetalleNomina = ({ setOperador, operador }) => {
     const dt = useRef(null);
 
     const exportColumns = cols.map((col) => ({ title: col.header, datakey: col.field }));
- 
-    const operadoresOptions = useGetEmpleadoCoordinadores(idCoordinador).map((list) => ({
-        value: list.idOperador,
-        label: list.nombres,
-      }));
 
-    //SUCURSALES ASIGNADAS AL COORDINADOR
-    const [tiendasOptions, setTiendasOptions] = useState([]);
-    const getTiendaCoordinador = async (idCoordinador) => {
-        const response = await API.get(`TiendaCoordinador/${idCoordinador}`);
-        if (response.status == 200 || response.status == 204) {
-            let data = response.data.map((data) => ({
-                value: data.idTienda,
-                label: data.nombreTienda
-            }));
-            setTiendasOptions(data)
-        }
-    }
+    const operadoresOptions = useGetEmpleadoCoordinadores(idCoordinador).map((list) => ({ value: list.idOperador, label: list.nombres }));
+    const tiendasOptions = useGetTiendaCoordinadores(idCoordinador).map((list) => ({ value: list.idTienda, label: list.nombreTienda }));
 
     const formatDateToYYYYMMDD = (date) => {
         const year = date.getFullYear();
