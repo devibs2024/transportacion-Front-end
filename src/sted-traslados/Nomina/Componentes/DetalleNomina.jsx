@@ -29,15 +29,15 @@ import { useGetTiendaCoordinadores } from "../../../hooks/useGetTiendaCoordinado
 
 export const PantallaDetalleNomina = ({ setOperador, operador }) => {
 
-    const [formState, setFormState] = useState(true);
-    const [error, setError] = useState(null);
-
-    const [idOperador, setIdOperador] = useState(0);
     const MySwal = withReactContent(Swal);
     const navigate = useNavigate();
     const location = useLocation();
 
+    const [formState, setFormState] = useState(true);
+    const [error, setError] = useState(null);
+
     const [calculonomina, setCalculoNomina] = useState([]);
+    const [idOperador, setIdOperador] = useState(0);
 
     const idCoordinador = decodeToken.tokenDecode();
 
@@ -50,137 +50,6 @@ export const PantallaDetalleNomina = ({ setOperador, operador }) => {
             formik.setValues(operador)
         }
     }, []);
-
-    const cols = [
-        { field: 'IdPlanificacion', header: 'Id Secuencia' },
-        { field: 'IdCoordinador', header: 'Id Secuencia' },
-        { field: 'Coordinador', header: 'Coordinador' },        
-        { field: 'IdOperador', header: 'Operador' },
-        { field: 'Operador', header: 'Operador' },
-        { field: 'Banco', header: 'Banco' },
-        { field: 'IdTienda', header: 'Tienda' },
-        { field: 'Tienda', header: 'Tienda' },
-        { field: 'ZonaSted', header: 'ZonaSted' },
-        { field: 'SubTotal', header: 'SubTotal' },
-        { field: 'MinutosRetardo', header: 'MinutosRetardo' },
-        { field: 'DescuentoRetardo', header: 'DescuentoRetardo' },
-        { field: 'DescuentoSted', header: 'DescuentoSted' },
-        { field: 'Gasolina', header: 'Gasolina' },
-        { field: 'PagoSMG', header: 'PagoSMG' },
-        { field: 'TotalPagar', header: 'TotalPagar' },
-    ];
-
-    const dt = useRef(null);
-
-    const exportColumns = cols.map((col) => ({ title: col.header, datakey: col.field }));
-
-    const operadoresOptions = useGetEmpleadoCoordinadores(idCoordinador).map((list) => ({ value: list.idOperador, label: list.nombres }));
-    const tiendasOptions = useGetTiendaCoordinadores(idCoordinador).map((list) => ({ value: list.idTienda, label: list.nombreTienda }));
-
-    const formatDateToYYYYMMDD = (date) => {
-        const year = date.getFullYear();
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const day = date.getDate().toString().padStart(2, '');
-
-        return `${year}-${month}-${day}`;
-    }
-
-    const [filters, setFilters] = useState({
-        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        idPlanificacion: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        //nombreOperador: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        //nombreCoordinador: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        //nombreTienda: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        //banco: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        //zonasted: { value: null, matchMode: FilterMatchMode.STARTS_WITH }
-    });
-
-    const [globalFilterValue, setGlobalFilterValue] = useState('');
-    const onGlobalFilterChange = (e) => {
-        const value = e.target.value;
-        let _filters = { ...filters };
-        setFilters(_filters);
-        setGlobalFilterValue(value);
-    };
-
-    const initFilters = () => {
-        setFilters({
-            global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-            idPlanificacion: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-            //nombreOperador: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-            //nombreCoordinador: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-            //nombreTienda: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-            //banco: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-            //zonasted: { value: null, matchMode: FilterMatchMode.STARTS_WITH }
-        });
-        setGlobalFilterValue('')
-    };
-
-    const clearFilter = () => {
-        initFilters();
-    }
-
-    const renderHeader = () => {
-        return (
-            <div className="d-flex justify-content-between">
-                <Button type="button" icon="pi pi-filter-slash" severity="secondary" label="Quitar Filtros" style={{ marginRight: "5px" }} outlined onClick={clearFilter}></Button>
-                <span className="p-input-icon-left">
-                    <i className="pi pi-search"></i>
-                    <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Buscar..."></InputText>
-                </span>
-            </div>
-        )
-    };
-
-    const header = renderHeader();
-
-    const customStyle = {
-        backgroundColor: '#F2F2F2',
-    };
-
-    const exportCSV = () => {
-        dt.current.exportCSV();
-    };
-
-    const exportPdf = () => {
-        import('jspdf').then((jsPDF) => {
-            import('jspdf-autotable').then(() => {
-
-                const doc = new jsPDF.default(0, 0);
-
-                doc.autoTable(exportColumns, calculonomina);
-                doc.save('Nomina.pdf');
-            });
-        });
-    };
-
-    const exportExcel = () => {
-
-        import('xlsx').then((xlsx) => {
-            const worksheet = xlsx.utils.json_to_sheet(calculonomina);
-            const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
-            const excelBuffer = xlsx.write(workbook, {
-                bookType: 'xlsx',
-                type: 'array'
-            });
-
-            saveAsExcelFile(excelBuffer, 'Nómina');
-        });
-    };
-
-    const saveAsExcelFile = (buffer, fileName) => {
-        import('file-saver').then((module) => {
-            if (module && module.default) {
-                let EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
-                let EXCEL_EXTENSION = '.xlsx';
-                const data = new Blob([buffer], {
-                    type: EXCEL_TYPE
-                });
-
-                module.default.saveAs(data, fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION);
-            }
-        });
-    };
 
     const getInitialValues = () => {
 
@@ -226,20 +95,160 @@ export const PantallaDetalleNomina = ({ setOperador, operador }) => {
 
             const response = await API.get(`CalculoNomina/${datos.fechaDesde},${datos.fechaHasta},${Number(datos.idOperador)},${Number(datos.idTienda)}`);
 
-            console.log(response.data)
-
-            if (response.status == 200 || response.status == 204)                
+            if (response.status == 200 || response.status == 204)
                 setCalculoNomina(response.data);
-            else 
+            else
                 accionFallida({ titulo: 'E R R O R', mensaje: 'NO SE PUDO PROCESAR' });
 
-        } catch (error) {
+        }
+        catch (error) {
 
             setError(error.response.data);
-            accionFallida({ titulo: 'E R R O R <br/> (INESPERADO)', mensaje: JSON.stringify(error.response.data) });
-        
+            accionFallida({ titulo: 'E R R O R', mensaje: JSON.stringify(error.response.data) });
+
         }
     }
+
+
+    //####################################################################################################################################################
+    //### COMBOS
+
+
+    const operadoresOptions = useGetEmpleadoCoordinadores(idCoordinador).map((list) => ({ value: list.idOperador, label: list.nombres }));
+    const tiendasOptions = useGetTiendaCoordinadores(idCoordinador).map((list) => ({ value: list.idTienda, label: list.nombreTienda }));
+
+
+    //####################################################################################################################################################
+    //### LISTADO
+
+
+    const cols = [
+        { field: 'IdPlanificacion', header: 'Id Secuencia' },
+        { field: 'IdCoordinador', header: 'Id Secuencia' },
+        { field: 'Coordinador', header: 'Coordinador' },
+        { field: 'IdOperador', header: 'IdOperador' },
+        { field: 'Operador', header: 'Operador' },
+        { field: 'IdSegmento', header: 'IdSegmento' },
+        { field: 'Spot', header: 'Spot' },
+        { field: 'Tarjeta', header: 'Tarjeta' },
+        { field: 'IdBanco', header: 'IdBanco' },
+        { field: 'Banco', header: 'Banco' },
+        { field: 'Salario', header: 'Salario' },
+        { field: 'IdTienda', header: 'Tienda' },
+        { field: 'Tienda', header: 'Tienda' },
+        { field: 'ZonaSted', header: 'ZonaSted' },
+        { field: 'SubTotal', header: 'SubTotal' },
+        { field: 'Gasolina', header: 'Gasolina' },
+        { field: 'HorasExtra', header: 'HorasExtra' },
+        { field: 'MinutosRetardo', header: 'MinutosRetardo' },
+        { field: 'DescuentoRetardo', header: 'DescuentoRetardo' },
+        { field: 'DescuentoSted', header: 'DescuentoSted' },
+        { field: 'Gasolina', header: 'Gasolina' },
+        { field: 'HorasExtra', header: 'HorasExtra' },
+        { field: 'PagoSMG', header: 'PagoSMG' },
+        { field: 'TotalPagar', header: 'TotalPagar' },
+    ];
+
+    const dt = useRef(null);
+
+
+    //####################################################################################################################################################
+    //### LISTADO | FILTROS
+
+
+    const [globalFilterValue, setGlobalFilterValue] = useState('');
+
+    const [filters, setFilters] = useState({
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        idOperador: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        operador: { value: null, matchMode: FilterMatchMode.STARTS_WITH }
+    });
+
+    const onGlobalFilterChange = (e) => {
+        const value = e.target.value;
+        let _filters = { ...filters };
+        setFilters(_filters);
+        setGlobalFilterValue(value);
+    };
+
+    const initFilters = () => {
+        setFilters({
+            global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            idOperador: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+            operador: { value: null, matchMode: FilterMatchMode.STARTS_WITH }
+        });
+        setGlobalFilterValue('')
+    };
+
+    const clearFilter = () => {
+        initFilters();
+    }
+
+
+    //####################################################################################################################################################
+    //### LISTADO | EXPORTAR
+
+
+    const exportColumns = cols.map((col) => ({ title: col.header, datakey: col.field }));
+
+    const customStyle = { backgroundColor: '#F2F2F2' };
+
+    //### LISTADO | EXPORTAR - CSV
+
+    const exportCSV = () => {
+        dt.current.exportCSV();
+    };
+
+    //### LISTADO | EXPORTAR - PDF
+
+    const exportPdf = () => {
+        import('jspdf').then((jsPDF) => {
+            import('jspdf-autotable').then(() => {
+
+                const doc = new jsPDF.default(0, 0);
+
+                doc.autoTable(exportColumns, calculonomina);
+                doc.save('Nomina.pdf');
+            });
+        });
+    };
+
+    //### LISTADO | EXPORTAR - EXCEL
+
+    const exportExcel = () => {
+
+        import('xlsx').then((xlsx) => {
+            const worksheet = xlsx.utils.json_to_sheet(calculonomina);
+            const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
+            const excelBuffer = xlsx.write(workbook, {
+                bookType: 'xlsx',
+                type: 'array'
+            });
+
+            saveAsExcelFile(excelBuffer, 'Nómina');
+        });
+    };
+
+    const saveAsExcelFile = (buffer, fileName) => {
+        import('file-saver').then((module) => {
+            if (module && module.default) {
+                let EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+                let EXCEL_EXTENSION = '.xlsx';
+                const data = new Blob([buffer], {
+                    type: EXCEL_TYPE
+                });
+
+                module.default.saveAs(data, fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION);
+            }
+        });
+    };
+
+
+    //####################################################################################################################################################
+    //### PANTALLA
+
+
+    //### PANTALLA | TOP
 
     const leftToolbarTemplate = () => {
         return (
@@ -337,8 +346,6 @@ export const PantallaDetalleNomina = ({ setOperador, operador }) => {
                         </Button>
                     </div>
 
-
-
                 </div>
 
             </Form>
@@ -356,6 +363,24 @@ export const PantallaDetalleNomina = ({ setOperador, operador }) => {
         );
     };
 
+    //### PANTALLA | LISTADO | HEADER
+
+    const renderHeader = () => {
+        return (
+            <div className="d-flex justify-content-between">
+                <Button type="button" icon="pi pi-filter-slash" severity="secondary" label="Quitar Filtros" style={{ marginRight: "5px" }} outlined onClick={clearFilter}></Button>
+                <span className="p-input-icon-left">
+                    <i className="pi pi-search"></i>
+                    <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Buscar..."></InputText>
+                </span>
+            </div>
+        )
+    };
+
+    const header = renderHeader();
+
+    //### PANTALLA | LISTADO | BODY
+
     return (
         <div className="mt-5">
             <CustomCard title="Calculo de Nomina">
@@ -372,14 +397,23 @@ export const PantallaDetalleNomina = ({ setOperador, operador }) => {
                         dataKey="idEmpleado"
                         filters={filters}
                         filterDisplay="row"
-                        globalFilterFields={['idSecuencia', 'coordinador', 'operador', 'inicio', 'final']}
+                        globalFilterFields={['idOperador', 'operador']}
                         header={header}
                         emptyMessage="No data found.">
-                        <Column field="coordinador" header="Coordinador" filter filterPlaceholder="Buscar por coordinador" style={{ minWidth: '12rem' }}></Column>                        
-                        <Column field="tienda" header="Tienda" filter filterPlaceholder="Buscar por tienda" style={{ minWidth: '12rem' }}></Column>                        
-                        <Column field="zonaSted" header="ZonaSted" filter filterPlaceholder="Buscar por zonasted" style={{ minWidth: '12rem' }}></Column>                        
-                        <Column field="operador" header="Operador" filter filterPlaceholder="Buscar por operador" style={{ minWidth: '12rem' }}></Column>                        
-                        <Column field="banco" header="Banco" filter filterPlaceholder="Buscar por banco" style={{ minWidth: '12rem' }}></Column>                        
+                        <Column field="idOperador" header="ID Sec." filter filterPlaceholder="Buscar por id secuencia" style={{ minWidth: '12rem' }}></Column>
+                        <Column field="operador" header="Operador" filter filterPlaceholder="Buscar por operador" style={{ minWidth: '12rem' }}></Column>
+                        <Column field="spot" header="Spot" style={{ minWidth: '12rem' }}></Column>
+                        <Column field="banco" header="Banco" style={{ minWidth: '12rem' }}></Column>
+                        <Column field="tarjeta" header="Tarjeta" style={{ minWidth: '12rem' }}></Column>
+                        <Column field="salario" header="Dias" style={{ minWidth: '12rem' }}></Column>
+                        <Column field="salario" header="Sueldo" style={{ minWidth: '12rem' }}></Column>
+                        <Column field="subTotal" header="SubTotal" style={{ minWidth: '12rem' }}></Column>
+                        <Column field="descuento" header="Desc." style={{ minWidth: '12rem' }}></Column>
+                        <Column field="bono" header="Bono" style={{ minWidth: '12rem' }}></Column>
+                        <Column field="gasolina" header="Gasolina" style={{ minWidth: '12rem' }}></Column>
+                        <Column field="subTotal" header="SubTotal" style={{ minWidth: '12rem' }}></Column>
+                        <Column field="pagoSMG" header="SMG" style={{ minWidth: '12rem' }}></Column>
+                        <Column field="totalPagar" header="Total" style={{ minWidth: '12rem' }}></Column>
                     </DataTable>
                 </div>
             </CustomCard>
