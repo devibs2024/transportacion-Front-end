@@ -27,7 +27,7 @@ import { procesarErrores } from "../../../shared/Utils/procesarErrores";
 import { useGetEmpleadoCoordinadores } from "../../../hooks/useGetEmpleadoCoordinador";
 import { useGetTiendaCoordinadores } from "../../../hooks/useGetTiendaCoordinador";
 
-export const PantallaDetalleNomina = ({ setOperador, operador }) => {
+export const PantallaDetalleNomina = (setNomina, nomina) => {
 
     const MySwal = withReactContent(Swal);
     const navigate = useNavigate();
@@ -36,25 +36,22 @@ export const PantallaDetalleNomina = ({ setOperador, operador }) => {
     const [formState, setFormState] = useState(true);
     const [error, setError] = useState(null);
 
-    const [calculonomina, setCalculoNomina] = useState([]);
-    const [idOperador, setIdOperador] = useState(0);
+    const [productividades, setProductividades] = useState([]);
+    const [volantes, setVolantes] = useState([]);
 
     const idCoordinador = decodeToken.tokenDecode();
 
     useEffect(() => {
-        if (location.state?.operador) {
-            formik.setValues(location.state.operador)
-            setIdOperador(location.state.operador.idOperador);
+        if (location.state?.productividad) {
+            formik.setValues(location.state.productividad);
         }
-        else if (operador.idOperador != 0) {
-            formik.setValues(operador)
-        }
+        setProductividades(location.state.productividad)
     }, []);
 
     const getInitialValues = () => {
 
         return {
-            //idPlanificacion: 0,
+            idPlanificacion: 0,
             idCoordinador: 0,
             idOperador: 0,
             idTienda: 0,
@@ -69,16 +66,16 @@ export const PantallaDetalleNomina = ({ setOperador, operador }) => {
         Form,
         onSubmit: values => {
 
-            let operador = {
-                //idPlanificacion: idPlanificacion,
-                idCoordinador: idCoordinador,
-                idOperador: values.idOperador,
-                idTienda: values.idTienda,
+            let nomina = {
+                idPlanificacion: productividades.idPlanificacion,
+                idCoordinador: productividades.idCoordinador,
+                idOperador: isNaN(values.idOperador) ? 0 : values.idOperador,
+                idTienda: isNaN(values.idTienda) ? 0 : values.idTienda,
                 fechaDesde: values.fechaDesde,
                 fechaHasta: values.fechaHasta
             };
 
-            getCalculoNomina(operador);
+            getCalculoNomina(nomina);
 
         },
     });
@@ -87,10 +84,10 @@ export const PantallaDetalleNomina = ({ setOperador, operador }) => {
 
         try {
 
-            const response = await API.get(`CalculoNomina/${datos.fechaDesde},${datos.fechaHasta},${Number(datos.idOperador)},${Number(datos.idTienda)}`);
+            const response = await API.get(`CalculoNomina/${Number(datos.idPlanificacion)},${datos.fechaDesde},${datos.fechaHasta},${Number(datos.idCoordinador)},${Number(datos.idOperador)},${Number(datos.idTienda)}`);
 
             if (response.status == 200 || response.status == 204)
-                setCalculoNomina(response.data);
+                setVolantes(response.data);
             else
                 accionFallida({ titulo: 'E R R O R', mensaje: 'NO SE PUDO PROCESAR' });
 
@@ -182,9 +179,7 @@ export const PantallaDetalleNomina = ({ setOperador, operador }) => {
         setGlobalFilterValue('')
     };
 
-    const clearFilter = () => {
-        initFilters();
-    }
+    const clearFilter = () => { initFilters(); }
 
 
     //####################################################################################################################################################
@@ -197,9 +192,7 @@ export const PantallaDetalleNomina = ({ setOperador, operador }) => {
 
     //### LISTADO | EXPORTAR - CSV
 
-    const exportCSV = () => {
-        dt.current.exportCSV();
-    };
+    const exportCSV = () => { dt.current.exportCSV(); };
 
     //### LISTADO | EXPORTAR - PDF
 
@@ -209,7 +202,7 @@ export const PantallaDetalleNomina = ({ setOperador, operador }) => {
 
                 const doc = new jsPDF.default(0, 0);
 
-                doc.autoTable(exportColumns, calculonomina);
+                doc.autoTable(exportColumns, volantes);
                 doc.save('Nomina.pdf');
             });
         });
@@ -220,7 +213,7 @@ export const PantallaDetalleNomina = ({ setOperador, operador }) => {
     const exportExcel = () => {
 
         import('xlsx').then((xlsx) => {
-            const worksheet = xlsx.utils.json_to_sheet(calculonomina);
+            const worksheet = xlsx.utils.json_to_sheet(volantes);
             const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
             const excelBuffer = xlsx.write(workbook, {
                 bookType: 'xlsx',
@@ -395,7 +388,7 @@ export const PantallaDetalleNomina = ({ setOperador, operador }) => {
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} rows"
                         ref={dt}
                         style={customStyle}
-                        value={calculonomina}
+                        value={volantes}
                         dataKey="idEmpleado"
                         filters={filters}
                         filterDisplay="row"

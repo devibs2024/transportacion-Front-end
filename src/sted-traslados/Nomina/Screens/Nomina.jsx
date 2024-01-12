@@ -19,29 +19,6 @@ import { data, event } from 'jquery';
 export const PantallaNomina = () => {
 
     const [productividades, setProductividades] = useState([]);
-    const [operador, setOperador] = useState({
-        idOperador: 0,
-        nombreOperador: '',
-        idTienda: 0,
-        nombreTienda: '',
-        idBanco: 0,
-        nombreBanco: '',
-        idZonaSted: 0,
-        nombreZonaSted: '',
-    });
-
-    const cols = [
-        { field: 'idSecuencia', header: 'Id Secuencia' },
-        { field: 'coordinador', header: 'Coordinador' },
-        { field: 'fechaDesde', header: 'Inicio' },
-        { field: 'frecuencia', header: 'Frecuencia' },
-        { field: 'estatus', header: 'Estado' },
-        { field: 'fechaHasta', header: 'Final' },
-    ];
-
-    const dt = useRef(null);
-
-    const exportColumns = cols.map((col) => ({ title: col.header, dataKey: col.field }));
 
     const navigate = useNavigate();
 
@@ -59,6 +36,27 @@ export const PantallaNomina = () => {
         }
     }
 
+    //####################################################################################################################################################
+    //### LISTADO
+
+
+    const cols = [
+        { field: 'idSecuencia', header: 'Id Secuencia' },
+        { field: 'coordinador', header: 'Coordinador' },
+        { field: 'fechaDesde', header: 'Inicio' },
+        { field: 'frecuencia', header: 'Frecuencia' },
+        { field: 'estatus', header: 'Estado' },
+        { field: 'fechaHasta', header: 'Final' },
+    ];
+
+    const dt = useRef(null);
+
+
+    //####################################################################################################################################################
+    //### LISTADO | FILTROS
+
+    const [globalFilterValue, setGlobalFilterValue] = useState('');
+
     const [filters, setFilters] = useState({
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         idSecuencia: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
@@ -68,17 +66,10 @@ export const PantallaNomina = () => {
         frecuencia: { value: null, matchMode: FilterMatchMode.STARTS_WITH }
     });
 
-    const [globalFilterValue, setGlobalFilterValue] = useState('');
-
-
     const onGlobalFilterChange = (e) => {
-
         const value = e.target.value;
-
         let _filters = { ...filters };
-
         _filters['global'].value = value;
-
         setFilters(_filters);
         setGlobalFilterValue(value);
     };
@@ -94,9 +85,92 @@ export const PantallaNomina = () => {
 
         setGlobalFilterValue('')
     }
-    const clearFilter = () => {
-        initFilters();
+
+    const clearFilter = () => { initFilters(); };
+
+
+    //####################################################################################################################################################
+    //### LISTADO | EXPORTAR
+
+
+    const exportColumns = cols.map((col) => ({ title: col.header, dataKey: col.field }));
+
+    const customStyle = { backgroundColor: '#f2f2f2' };
+
+    //### LISTADO | EXPORTAR - CSV
+
+    const exportCSV = () => {        dt.current.exportCSV();    };
+
+    //### LISTADO | EXPORTAR - PDF
+
+    const exportPdf = () => {
+        import('jspdf').then((jsPDF) => {
+            import('jspdf-autotable').then(() => {
+
+                const doc = new jsPDF.default(0, 0);
+
+                doc.autoTable(exportColumns, productividades);
+                doc.save('Productividades.pdf');
+            });
+        });
     };
+
+    //### LISTADO | EXPORTAR - EXCEL
+
+    const exportExcel = () => {
+
+        import('xlsx').then((xlsx) => {
+            const worksheet = xlsx.utils.json_to_sheet(productividades);
+            const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
+            const excelBuffer = xlsx.write(workbook, {
+                bookType: 'xlsx',
+                type: 'array'
+            });
+
+            saveAsExcelFile(excelBuffer, 'Productividades');
+        });
+    };
+
+    const saveAsExcelFile = (buffer, fileName) => {
+        import('file-saver').then((module) => {
+            if (module && module.default) {
+                let EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+                let EXCEL_EXTENSION = '.xlsx';
+                const data = new Blob([buffer], {
+                    type: EXCEL_TYPE
+                });
+
+                module.default.saveAs(data, fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION);
+            }
+        });
+    };
+
+
+    //####################################################################################################################################################
+    //### PANTALLA
+
+
+    //### PANTALLA | TOP
+
+    const leftToolbarTemplate = () => {
+        return (
+            <div className='flex flex-wrap gap-3 justify-content-center justify-content-between'>
+
+            </div>
+        );
+    };
+
+    const rightToolbarTemplate = () => {
+        return (
+            <div className="flex flex-wrap gap-3 justify-content-center justify-content-between">
+                <Button type="button" tooltip='Descargar CSV' icon="pi pi-file" severity="secondary" rounded onClick={() => exportCSV(false)} data-pr-tooltip="CSV" style={{ marginRight: "5px" }} />
+                <Button type="button" icon="pi pi-file-excel" tooltip='Descargar Excel' severity="success" rounded onClick={exportExcel} data-pr-tooltip="XLS" style={{ marginRight: "5px" }} />
+                <Button type="button" icon="pi pi-file-pdf" tooltip='Descargar PDF' style={{ 'backgroundColor': 'red', borderColor: 'white', color: 'white' }} rounded onClick={exportPdf} data-pr-tooltip="PDF" />
+            </div>
+        );
+    };
+
+    //### PANTALLA | LISTADO | HEADER
 
     const renderHeader = () => {
         return (
@@ -112,70 +186,7 @@ export const PantallaNomina = () => {
 
     const header = renderHeader();
 
-    const customStyle = {
-        backgroundColor: '#f2f2f2',
-    };
-
-    const exportCSV = () => {
-        dt.current.exportCSV();
-    };
-
-    const exportPdf = () => {
-        import('jspdf').then((jsPDF) => {
-            import('jspdf-autotable').then(() => {
-
-                const doc = new jsPDF.default(0, 0);
-
-                doc.autoTable(exportColumns, productividades);
-                doc.save('Productividades.pdf');
-            });
-        });
-    };
-
-    const exportExcel = () => {
-
-        import('xlsx').then((xlsx) => {
-            const worksheet = xlsx.utils.json_to_sheet(productividades);
-            const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
-            const excelBuffer = xlsx.write(workbook, {
-                bookType: 'xlsx',
-                type: 'array'
-            });
-
-            saveAsExcelFile(excelBuffer, 'Productividades');
-        });
-    };
-    const saveAsExcelFile = (buffer, fileName) => {
-        import('file-saver').then((module) => {
-            if (module && module.default) {
-                let EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
-                let EXCEL_EXTENSION = '.xlsx';
-                const data = new Blob([buffer], {
-                    type: EXCEL_TYPE
-                });
-
-                module.default.saveAs(data, fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION);
-            }
-        });
-    };
-
-    const rightToolbarTemplate = () => {
-        return (
-            <div className="flex flex-wrap gap-3 justify-content-center justify-content-between">
-                <Button type="button" tooltip='Descargar CSV' icon="pi pi-file" severity="secondary" rounded onClick={() => exportCSV(false)} data-pr-tooltip="CSV" style={{ marginRight: "5px" }} />
-                <Button type="button" icon="pi pi-file-excel" tooltip='Descargar Excel' severity="success" rounded onClick={exportExcel} data-pr-tooltip="XLS" style={{ marginRight: "5px" }} />
-                <Button type="button" icon="pi pi-file-pdf" tooltip='Descargar PDF' style={{ 'backgroundColor': 'red', borderColor: 'white', color: 'white' }} rounded onClick={exportPdf} data-pr-tooltip="PDF" />
-            </div>
-        );
-    };
-    
-    const leftToolbarTemplate = () => {
-        return(
-            <div className='flex flex-wrap gap-3 justify-content-center justify-content-between'>
-
-            </div>
-        );
-    };
+    //### PANTALLA | LISTADO | BODY
 
     return (
         <div className="mt-5">
@@ -191,7 +202,7 @@ export const PantallaNomina = () => {
                             header="ID de Secuencia"
                             body={(rowData) => {
                                 const idWithPadding = String(rowData.idPlanificacion).padStart(6, '0');
-                                return <a onClick={() => navigate(`${rutaServidor}/Nomina/Componentes/DetalleNomina`, {state: {operador: rowData}})} style={{ color: '#007bff', cursor: 'pointer' }}>{idWithPadding}</a>
+                                return <a onClick={() => navigate(`${rutaServidor}/Nomina/Componentes/DetalleNomina`, { state: { productividad: rowData } })} style={{ color: '#007bff', cursor: 'pointer' }}>{idWithPadding}</a>
                             }}
                             filter
                             filterPlaceholder="Buscar por Id de Secuencia"
@@ -207,4 +218,5 @@ export const PantallaNomina = () => {
             </CustomCard>
         </div>
     );
+
 }
