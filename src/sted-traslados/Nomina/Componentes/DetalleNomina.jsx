@@ -54,11 +54,10 @@ export const PantallaDetalleNomina = ({ setOperador, operador }) => {
     const getInitialValues = () => {
 
         return {
+            //idPlanificacion: 0,
             idCoordinador: 0,
             idOperador: 0,
-            nombreOperador: '',
             idTienda: 0,
-            nombreTienda: '',
             fechaDesde: '',
             fechaHasta: ''
         }
@@ -67,19 +66,14 @@ export const PantallaDetalleNomina = ({ setOperador, operador }) => {
 
     const formik = useFormik({
         initialValues: getInitialValues(),
-        validationSchema: Yup.object().shape({
-            idOperador: Yup.string().required("El operador es obligatorio"),
-            idTienda: Yup.string().required("La sucursal es obligatoria"),
-        }),
         Form,
         onSubmit: values => {
 
             let operador = {
+                //idPlanificacion: idPlanificacion,
                 idCoordinador: idCoordinador,
                 idOperador: values.idOperador,
-                nombreOperador: values.nombreOperador,
                 idTienda: values.idTienda,
-                nombreTienda: values.nombreTienda,
                 fechaDesde: values.fechaDesde,
                 fechaHasta: values.fechaHasta
             };
@@ -123,30 +117,38 @@ export const PantallaDetalleNomina = ({ setOperador, operador }) => {
 
 
     const cols = [
-        { field: 'IdPlanificacion', header: 'Id Secuencia' },
         { field: 'IdCoordinador', header: 'Id Secuencia' },
         { field: 'Coordinador', header: 'Coordinador' },
+
         { field: 'IdOperador', header: 'IdOperador' },
         { field: 'Operador', header: 'Operador' },
+
         { field: 'IdSegmento', header: 'IdSegmento' },
+        { field: 'Segmento', header: 'Segmento' },
         { field: 'Spot', header: 'Spot' },
+
         { field: 'Tarjeta', header: 'Tarjeta' },
         { field: 'IdBanco', header: 'IdBanco' },
         { field: 'Banco', header: 'Banco' },
+
         { field: 'Salario', header: 'Salario' },
+        { field: 'SMG', header: 'SMG' },
+
         { field: 'IdTienda', header: 'Tienda' },
         { field: 'Tienda', header: 'Tienda' },
+        { field: 'IdZonaSted', header: 'Tienda' },
         { field: 'ZonaSted', header: 'ZonaSted' },
-        { field: 'SubTotal', header: 'SubTotal' },
+
+        { field: 'Dias', header: 'Dias' },
+
+        { field: 'SubTotal1', header: 'SubTotal1' },
+        { field: 'Descuento', header: 'Descuento' },
+        { field: 'Bono', header: 'Bono' },
         { field: 'Gasolina', header: 'Gasolina' },
-        { field: 'HorasExtra', header: 'HorasExtra' },
-        { field: 'MinutosRetardo', header: 'MinutosRetardo' },
-        { field: 'DescuentoRetardo', header: 'DescuentoRetardo' },
-        { field: 'DescuentoSted', header: 'DescuentoSted' },
-        { field: 'Gasolina', header: 'Gasolina' },
-        { field: 'HorasExtra', header: 'HorasExtra' },
-        { field: 'PagoSMG', header: 'PagoSMG' },
-        { field: 'TotalPagar', header: 'TotalPagar' },
+        { field: 'SubTotal2', header: 'SubTotal2' },
+        { field: 'Total', header: 'Total' },
+        { field: 'STED', header: 'STED' },
+        { field: 'Pago', header: 'Pago' },
     ];
 
     const dt = useRef(null);
@@ -405,15 +407,17 @@ export const PantallaDetalleNomina = ({ setOperador, operador }) => {
                         <Column field="spot" header="Spot" style={{ minWidth: '12rem' }}></Column>
                         <Column field="banco" header="Banco" style={{ minWidth: '12rem' }}></Column>
                         <Column field="tarjeta" header="Tarjeta" style={{ minWidth: '12rem' }}></Column>
-                        <Column field="salario" header="Dias" style={{ minWidth: '12rem' }}></Column>
+                        <Column field="dias" header="Dias" style={{ minWidth: '12rem' }}></Column>
                         <Column field="salario" header="Sueldo" style={{ minWidth: '12rem' }}></Column>
-                        <Column field="subTotal" header="SubTotal" style={{ minWidth: '12rem' }}></Column>
+                        <Column field="subTotal1" header="SubTotal" style={{ minWidth: '12rem' }}></Column>
                         <Column field="descuento" header="Desc." style={{ minWidth: '12rem' }}></Column>
                         <Column field="bono" header="Bono" style={{ minWidth: '12rem' }}></Column>
                         <Column field="gasolina" header="Gasolina" style={{ minWidth: '12rem' }}></Column>
-                        <Column field="subTotal" header="SubTotal" style={{ minWidth: '12rem' }}></Column>
-                        <Column field="pagoSMG" header="SMG" style={{ minWidth: '12rem' }}></Column>
-                        <Column field="totalPagar" header="Total" style={{ minWidth: '12rem' }}></Column>
+                        <Column field="subTotal2" header="SubTotal" style={{ minWidth: '12rem' }}></Column>
+                        <Column field="smg" header="SMG" style={{ minWidth: '12rem' }}></Column>
+                        <Column field="total" header="Total" style={{ minWidth: '12rem' }}></Column>
+                        <Column field="sted" header="STED" style={{ minWidth: '12rem' }}></Column>
+                        <Column field="pago" header="Pago" style={{ minWidth: '12rem' }}></Column>
                     </DataTable>
                 </div>
             </CustomCard>
