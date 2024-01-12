@@ -39,7 +39,13 @@ export const PantallaDetalleNomina = (setNomina, nomina) => {
     const [productividades, setProductividades] = useState([]);
     const [volantes, setVolantes] = useState([]);
 
+    //####################################################################################################################################################
+    //### VARIABLES GLOBALES
+
     const idCoordinador = decodeToken.tokenDecode();
+
+    //####################################################################################################################################################
+    //### ???
 
     useEffect(() => {
         if (location.state?.productividad) {
@@ -93,10 +99,8 @@ export const PantallaDetalleNomina = (setNomina, nomina) => {
 
         }
         catch (error) {
-
             setError(error.response.data);
             accionFallida({ titulo: 'E R R O R', mensaje: JSON.stringify(error.response.data) });
-
         }
     }
 
@@ -199,9 +203,7 @@ export const PantallaDetalleNomina = (setNomina, nomina) => {
     const exportPdf = () => {
         import('jspdf').then((jsPDF) => {
             import('jspdf-autotable').then(() => {
-
                 const doc = new jsPDF.default(0, 0);
-
                 doc.autoTable(exportColumns, volantes);
                 doc.save('Nomina.pdf');
             });
@@ -219,7 +221,6 @@ export const PantallaDetalleNomina = (setNomina, nomina) => {
                 bookType: 'xlsx',
                 type: 'array'
             });
-
             saveAsExcelFile(excelBuffer, 'Nómina');
         });
     };
@@ -232,7 +233,6 @@ export const PantallaDetalleNomina = (setNomina, nomina) => {
                 const data = new Blob([buffer], {
                     type: EXCEL_TYPE
                 });
-
                 module.default.saveAs(data, fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION);
             }
         });

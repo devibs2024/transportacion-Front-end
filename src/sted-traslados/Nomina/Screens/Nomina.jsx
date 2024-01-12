@@ -106,9 +106,7 @@ export const PantallaNomina = () => {
     const exportPdf = () => {
         import('jspdf').then((jsPDF) => {
             import('jspdf-autotable').then(() => {
-
                 const doc = new jsPDF.default(0, 0);
-
                 doc.autoTable(exportColumns, productividades);
                 doc.save('Productividades.pdf');
             });
@@ -126,7 +124,6 @@ export const PantallaNomina = () => {
                 bookType: 'xlsx',
                 type: 'array'
             });
-
             saveAsExcelFile(excelBuffer, 'Productividades');
         });
     };
@@ -139,7 +136,6 @@ export const PantallaNomina = () => {
                 const data = new Blob([buffer], {
                     type: EXCEL_TYPE
                 });
-
                 module.default.saveAs(data, fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION);
             }
         });
