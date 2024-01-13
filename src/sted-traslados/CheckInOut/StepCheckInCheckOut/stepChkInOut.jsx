@@ -8,18 +8,18 @@ import { accionFallida } from '../../../shared/Utils/modals';
 
 export const StepChkInOut = () => {
     const [existCheckIn, setExistCheckIn] = useState(null);
-    const [loaded, setLoaded ] = useState(false);
+    const [loaded, setLoaded] = useState(false);
     useEffect(() => {
         const handleBeforeUnload = (event) => {
-          event.preventDefault();
-          event.returnValue = ''; //Estaba a punto de hacer CheckIn. Desea Salir de esta pagina?
+            event.preventDefault();
+            event.returnValue = ''; //Estaba a punto de hacer CheckIn. Desea Salir de esta pagina?
         };
-        if(localStorage.getItem("stepActiveChkOut") !== null){
+        if (localStorage.getItem("stepActiveChkOut") !== null) {
             setActiveIndex(4)
         }
         window.addEventListener('beforeunload', handleBeforeUnload);
-    
-        return () => { window.removeEventListener('beforeunload', handleBeforeUnload); }; 
+
+        return () => { window.removeEventListener('beforeunload', handleBeforeUnload); };
     }, []);
 
     const [activeIndex, setActiveIndex] = useState(0);
@@ -27,71 +27,71 @@ export const StepChkInOut = () => {
     const [chkInOutComplete, setChkInOutComplete] = useState(false);
 
     const items = [
-        { label: 'Foto Entrada 1'},
-        { label: 'Foto Entrada 2'},
-        { label: 'Foto Entrada 3'},
-        { label: 'Foto Entrada 4'},
+        { label: 'Foto Entrada 1' },
+        { label: 'Foto Entrada 2' },
+        { label: 'Foto Entrada 3' },
+        { label: 'Foto Entrada 4' },
     ];
     // {
     //label: 'Foto 2',
     //command: (event) => { }
     //},
     const checkOutItem = [
-        { label: 'Foto Salida 1'},
-        { label: 'Foto Salida 2'},
-        { label: 'Foto Salida 3'},
+        { label: 'Foto Salida 1' },
+        { label: 'Foto Salida 2' },
+        { label: 'Foto Salida 3' },
     ];
 
-    useEffect(()=> {
-        if(activeIndex === 4){
+    useEffect(() => {
+        if (activeIndex === 4) {
             getCheckInOut()
         }
-    },[activeIndex])
+    }, [activeIndex])
 
-    useEffect(()=>{
-        if(activeIndex === 0){
+    useEffect(() => {
+        if (activeIndex === 0) {
             CheckInAndCheckOutCompleted()
         }
-    },[])
+    }, [])
 
     const getCheckInOut = async () => {
         const idEmpleado = decodeToken.tokenDecode()
         try {
-          const check = await API.get(`CheckIn_CkechOut/CheckInOut/${Number(idEmpleado)}`)
-          if(check.data){
-              setExistCheckIn(true)
-              setActiveIndex(4)
-          }
+            const check = await API.get(`CheckIn_CkechOut/CheckInOut/${Number(idEmpleado)}`)
+            if (check.data) {
+                setExistCheckIn(true)
+                setActiveIndex(4)
+            }
         } catch (error) {
             setExistCheckIn(false)
-            accionFallida({titulo: 'Error!', mensaje: error.message})
+            accionFallida({ titulo: 'Error!', mensaje: error.message })
         }
     }
 
     const CheckInAndCheckOutCompleted = async () => {
         const idEmpleado = decodeToken.tokenDecode()
         try {
-          const check = await API.get(`CheckIn_CkechOut/CheckInAndCheckOutComplete/${Number(idEmpleado)}`)
-          if(check.data){
-              setChkInOutComplete(true)
-          }else{
-              setChkInOutComplete(false)
-          }
+            const check = await API.get(`CheckIn_CkechOut/CheckInAndCheckOutComplete/${Number(idEmpleado)}`)
+            if (check.data) {
+                setChkInOutComplete(true)
+            } else {
+                setChkInOutComplete(false)
+            }
         } catch (error) {
-          accionFallida({titulo: 'Error!', mensaje: error.message})
+            accionFallida({ titulo: 'Error!', mensaje: error.message })
         }
     }
 
-    const StepPhotos = ({activeIndex}) => {
-        if(activeIndex === 4){
+    const StepPhotos = ({ activeIndex }) => {
+        if (activeIndex === 4) {
             let activeStepLocalStorage = 0;
-            if(localStorage.getItem("stepActiveChkOut") !== null){
+            if (localStorage.getItem("stepActiveChkOut") !== null) {
                 activeStepLocalStorage = JSON.parse(localStorage.getItem("stepActiveChkOut"))
                 setActiveIndex(Number(activeStepLocalStorage))
             }
         }
-        
-        if(activeIndex <= 3) {
+
+        if (activeIndex <= 3) {
             switch (activeIndex) {
                 case 0:
                     return (<PantallaCheckInCheckOut title={"CheckIn 1 - Foto de perfil"} setActiveIndex={setActiveIndex} activeIndex={activeIndex} />)
@@ -104,14 +104,14 @@ export const StepChkInOut = () => {
                 default:
                     break;
             }
-        }else {
+        } else {
             switch (activeIndex) {
                 case 4:
-                    return(<PantallaCheckInCheckOut title={"CheckOut 1 - Foto Perfil"} setActiveIndex={setActiveIndex} activeIndex={activeIndex}/>)
+                    return (<PantallaCheckInCheckOut title={"CheckOut 1 - Foto Perfil"} setActiveIndex={setActiveIndex} activeIndex={activeIndex} />)
                 case 5:
-                    return(<PantallaCheckInCheckOut title={"CheckOut 2 - Foto Uniforme"} setActiveIndex={setActiveIndex} activeIndex={activeIndex}/>)
+                    return (<PantallaCheckInCheckOut title={"CheckOut 2 - Foto Uniforme"} setActiveIndex={setActiveIndex} activeIndex={activeIndex} />)
                 case 6:
-                    return(<PantallaCheckInCheckOut title={"CheckOut 3 - Foto Factura"} setActiveIndex={setActiveIndex} activeIndex={activeIndex}/>)
+                    return (<PantallaCheckInCheckOut title={"CheckOut 3 - Foto Factura"} setActiveIndex={setActiveIndex} activeIndex={activeIndex} />)
                 default:
                     break;
             }
@@ -122,26 +122,26 @@ export const StepChkInOut = () => {
         <>
             {
                 chkInOutComplete === false ? //Si el CheckIn y el CheckOut esta completo presentara la pestaña debajo
-                <>
-                    <div className="card mt-3 mb-3">
-                        <Steps 
-                            className="p-menuitem-link p-2 p-steps-title"
-                            model={existCheckIn ? checkOutItem : items} 
-                            activeIndex={activeIndex} 
-                            onSelect={(e) => setActiveIndex(e.index)} 
-                            readOnly={true}             
-                        />
-                    </div>
-                    <StepPhotos activeIndex={activeIndex}/> 
-                </> : 
-                <>
-                    <div className='mt-3'>
-                        <center>
-                            <h3>Ya hizo CheckIn y CkechOut, Vuelva mañana para hacer otro CheckIn</h3>          
-                        </center>
-                    </div>
-                </>
-            }    
+                    <>
+                        <div className="card mt-3 mb-3">
+                            <Steps
+                                className="p-menuitem-link p-2 p-steps-title"
+                                model={existCheckIn ? checkOutItem : items}
+                                activeIndex={activeIndex}
+                                onSelect={(e) => setActiveIndex(e.index)}
+                                readOnly={true}
+                            />
+                        </div>
+                        <StepPhotos activeIndex={activeIndex} />
+                    </> :
+                    <>
+                        <div className='mt-3'>
+                            <center>
+                                <h3>Ya hizo CheckIn y CkechOut, Vuelva mañana para hacer otro CheckIn</h3>
+                            </center>
+                        </div>
+                    </>
+            }
         </>
     )
 }
