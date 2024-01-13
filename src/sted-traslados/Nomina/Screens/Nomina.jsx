@@ -4,17 +4,18 @@ import React, { useState, useEffect, useRef } from 'react';
 import * as decodeToken from '../../../shared/Utils/decodeToken';
 
 import { useNavigate } from "react-router";
+import { rutaServidor } from '../../../routes/rutaServidor';
 
 import { FilterMatchMode } from 'primereact/api';
 import { Toolbar } from 'primereact/toolbar';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 
+import { CustomCard } from '../../../shared/card-custom';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 
-import { CustomCard } from '../../../shared/card-custom';
-import { rutaServidor } from '../../../routes/rutaServidor';
+import { accionFallida } from '../../../shared/Utils/modals';
 
 export const PantallaNomina = () => {
 
@@ -22,6 +23,8 @@ export const PantallaNomina = () => {
     //### VARIABLES GLOBALES
 
     const navigate = useNavigate();
+
+    const [error, setError] = useState(null);
 
     const [productividades, setProductividades] = useState([]);
 
@@ -41,13 +44,21 @@ export const PantallaNomina = () => {
 
     const getProductividades = async () => {
 
-        const idCoordinador = decodeToken.tokenDecode()
+        try {
+
+            const idCoordinador = decodeToken.tokenDecode()
 
         const response = await API.get(`ProductividadHeader/${Number(idCoordinador)}`);
 
         if (response.status == 200 || response.status == 204) {
 
             setProductividades(response.data);
+            }
+
+        }
+        catch (e) {
+            setError(e.response.data)
+            accionFallida({ titulo: 'E R R O R', mensaje: JSON.stringify(e.response.data) });
         }
     }
 
