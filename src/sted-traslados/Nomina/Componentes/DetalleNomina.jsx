@@ -1,57 +1,57 @@
-import React, { useState, useEffect, useRef } from "react";
-import { FilterMatchMode } from "primereact/api";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import { InputText } from "primereact/inputtext";
 import API from "../../../store/api";
-import { Button } from "primereact/button";
+
+import React, { useState, useEffect, useRef } from "react";
+import * as decodeToken from '../../../shared/Utils/decodeToken';
+
 import { useNavigate } from "react-router";
 import { useLocation } from "react-router-dom";
+
+import { useFormik } from "formik";
+import { Form, Modal } from "react-bootstrap";
+
+import { FilterMatchMode } from "primereact/api";
 import { Toolbar } from "primereact/toolbar";
+import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column";
+
 import { CustomCard } from "../../../shared/card-custom";
-import { rutaServidor } from "../../../routes/rutaServidor";
-import * as decodeToken from '../../../shared/Utils/decodeToken';
-import { Modal, Form } from "react-bootstrap";
+import { InputText } from "primereact/inputtext";
+import { Button } from "primereact/button";
 import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import jsPDF from "jspdf";
-import { array, date } from "yup";
-import { data, event } from "jquery";
-import { Formik, useFormik } from "formik";
-import Swal from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
-import * as Yup from "yup";
-import { accionExitosa, accionFallida } from '../../../shared/Utils/modals';
-import { procesarErrores } from "../../../shared/Utils/procesarErrores";
+
+import { accionFallida } from '../../../shared/Utils/modals';
 
 import { useGetEmpleadoCoordinadores } from "../../../hooks/useGetEmpleadoCoordinador";
 import { useGetTiendaCoordinadores } from "../../../hooks/useGetTiendaCoordinador";
 
 export const PantallaDetalleNomina = (setNomina, nomina) => {
 
-    const MySwal = withReactContent(Swal);
+    //####################################################################################################################################################
+    //### VARIABLES GLOBALES
+
     const navigate = useNavigate();
     const location = useLocation();
 
-    const [formState, setFormState] = useState(true);
     const [error, setError] = useState(null);
 
     const [productividades, setProductividades] = useState([]);
     const [volantes, setVolantes] = useState([]);
 
-    //####################################################################################################################################################
-    //### VARIABLES GLOBALES
-
     const idCoordinador = decodeToken.tokenDecode();
 
     //####################################################################################################################################################
-    //### ???
+    //### EVENTOS
 
     useEffect(() => {
+
         if (location.state?.productividad) {
             formik.setValues(location.state.productividad);
+            setProductividades(location.state.productividad)
         }
-        setProductividades(location.state.productividad)
+        else {
+            accionFallida({ titulo: 'E R R O R', mensaje: 'FALTA INFORMACIÓN' });
+        }
+
     }, []);
 
     const getInitialValues = () => {
@@ -86,6 +86,11 @@ export const PantallaDetalleNomina = (setNomina, nomina) => {
         },
     });
 
+
+    //####################################################################################################################################################
+    //### API
+
+
     const getCalculoNomina = async (datos) => {
 
         try {
@@ -98,9 +103,9 @@ export const PantallaDetalleNomina = (setNomina, nomina) => {
                 accionFallida({ titulo: 'E R R O R', mensaje: 'NO SE PUDO PROCESAR' });
 
         }
-        catch (error) {
-            setError(error.response.data);
-            accionFallida({ titulo: 'E R R O R', mensaje: JSON.stringify(error.response.data) });
+        catch (e) {
+            setError(e.response.data)
+            accionFallida({ titulo: 'E R R O R', mensaje: JSON.stringify(e.response.data) });
         }
     }
 
@@ -213,7 +218,6 @@ export const PantallaDetalleNomina = (setNomina, nomina) => {
     //### LISTADO | EXPORTAR - EXCEL
 
     const exportExcel = () => {
-
         import('xlsx').then((xlsx) => {
             const worksheet = xlsx.utils.json_to_sheet(volantes);
             const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
@@ -253,9 +257,9 @@ export const PantallaDetalleNomina = (setNomina, nomina) => {
                 <div className='flex flex-wrap gap-2'>
 
                     <div className='col col-sm-3'>
-                        <Form.Group controlId="idOperador">
+                        <Form.Group>
                             <Form.Label>Operador:</Form.Label>
-                            <Form.Control as="select" value={formik.values.idOperador} onChange={formik.handleChange} onBlur={formik.handleBlur} >
+                            <Form.Control name="idOperador" as="select" value={formik.values.idOperador} onChange={formik.handleChange} onBlur={formik.handleBlur} >
                                 <option value="">Seleccione un Operador</option>
                                 {
                                     operadoresOptions.map((option) => (
@@ -274,9 +278,9 @@ export const PantallaDetalleNomina = (setNomina, nomina) => {
                     <br />
 
                     <div className='col col-sm-3'>
-                        <Form.Group controlId="idTienda">
+                        <Form.Group>
                             <Form.Label>Sucursal:</Form.Label>
-                            <Form.Control as="select" value={formik.values.idTienda} onChange={formik.handleChange} onBlur={formik.handleBlur}>
+                            <Form.Control name="idTienda" as="select" value={formik.values.idTienda} onChange={formik.handleChange} onBlur={formik.handleBlur}>
                                 <option value="">Seleccione la Sucursal</option>
                                 {
                                     tiendasOptions.map((option) => (
@@ -295,9 +299,9 @@ export const PantallaDetalleNomina = (setNomina, nomina) => {
                     <br />
 
                     <div className='col col-sm-2'>
-                        <Form.Group controlId="fechaDesde">
+                        <Form.Group>
                             <Form.Label>Fecha Desde:</Form.Label>
-                            <DatePicker id="fechaDesde" name="fechaDesde" autoComplete="off" style={{ width: "63%" }}
+                            <DatePicker name="fechaDesde" autoComplete="off" style={{ width: "63%" }}
                                 selected={formik.values.fechaDesde ? new Date(formik.values.fechaDesde) : null}
                                 onChange={(date) => formik.setFieldValue('fechaDesde', date)}
                                 onBlur={formik.handleBlur}
@@ -313,9 +317,9 @@ export const PantallaDetalleNomina = (setNomina, nomina) => {
                     <br />
 
                     <div className='col col-sm-2'>
-                        <Form.Group controlId="fechaHasta">
+                        <Form.Group>
                             <Form.Label>Fecha Hasta:</Form.Label>
-                            <DatePicker id="fechaHasta" name="fechaHasta" autoComplete="off" style={{ width: "63%" }}
+                            <DatePicker name="fechaHasta" autoComplete="off" style={{ width: "63%" }}
                                 selected={formik.values.fechaHasta ? new Date(formik.values.fechaHasta) : null}
                                 onChange={(date) => formik.setFieldValue('fechaHasta', date)}
                                 onBlur={formik.handleBlur}

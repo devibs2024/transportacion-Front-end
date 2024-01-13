@@ -1,28 +1,43 @@
+import API from "../../../store/api";
+
 import React, { useState, useEffect, useRef } from 'react';
+import * as decodeToken from '../../../shared/Utils/decodeToken';
+
+import { useNavigate } from "react-router";
+
 import { FilterMatchMode } from 'primereact/api';
+import { Toolbar } from 'primereact/toolbar';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import { InputText } from 'primereact/inputtext';
-import { TriStateCheckbox } from 'primereact/tristatecheckbox';
-import API from '../../../store/api';
+
 import { Button } from 'primereact/button';
-import { accionExitosa, accionFallida, confirmarAccion } from '../../../shared/Utils/modals';
-import { useNavigate } from 'react-router-dom';
-import { Toolbar } from 'primereact/toolbar';
+import { InputText } from 'primereact/inputtext';
+
 import { CustomCard } from '../../../shared/card-custom';
 import { rutaServidor } from '../../../routes/rutaServidor';
-import { Link } from 'react-router-dom';
-import * as decodeToken from '../../../shared/Utils/decodeToken';
-import { data, event } from 'jquery';
-
 
 export const PantallaNomina = () => {
 
-    const [productividades, setProductividades] = useState([]);
+    //####################################################################################################################################################
+    //### VARIABLES GLOBALES
 
     const navigate = useNavigate();
 
-    useEffect(() => { getProductividades(); }, [])
+    const [productividades, setProductividades] = useState([]);
+
+    //####################################################################################################################################################
+    //### EVENTOS
+
+    useEffect(() => {
+
+        getProductividades();
+
+    }, [])
+
+
+    //####################################################################################################################################################
+    //### API
+
 
     const getProductividades = async () => {
 
@@ -36,12 +51,17 @@ export const PantallaNomina = () => {
         }
     }
 
+
+    //####################################################################################################################################################
+    //### COMBOS
+
+
     //####################################################################################################################################################
     //### LISTADO
 
 
     const cols = [
-        { field: 'idSecuencia', header: 'Id Secuencia' },
+        { field: 'idPlanificacion', header: 'Id Secuencia' },
         { field: 'coordinador', header: 'Coordinador' },
         { field: 'fechaDesde', header: 'Inicio' },
         { field: 'frecuencia', header: 'Frecuencia' },
@@ -59,7 +79,8 @@ export const PantallaNomina = () => {
 
     const [filters, setFilters] = useState({
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        idSecuencia: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        idPlanificacion: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        coordinador: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         fechaDesde: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         fechaHasta: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         estatus: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
@@ -77,12 +98,13 @@ export const PantallaNomina = () => {
     const initFilters = () => {
         setFilters({
             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            idPlanificacion: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+            coordinador: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
             inicio: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
             final: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-            estado: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+            estatus: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
             frecuencia: { value: null, matchMode: FilterMatchMode.EQUALS }
         });
-
         setGlobalFilterValue('')
     }
 
@@ -99,7 +121,7 @@ export const PantallaNomina = () => {
 
     //### LISTADO | EXPORTAR - CSV
 
-    const exportCSV = () => {        dt.current.exportCSV();    };
+    const exportCSV = () => { dt.current.exportCSV(); };
 
     //### LISTADO | EXPORTAR - PDF
 
@@ -188,18 +210,21 @@ export const PantallaNomina = () => {
         <div className="mt-5">
             <CustomCard title="Nómina" >
                 <div className="p-3">
-                    <Toolbar className="mb-4" right={rightToolbarTemplate}></Toolbar>
+                    <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
                     <DataTable paginator rows={5} rowsPerPageOptions={[5, 10, 25]}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} rows" ref={dt} style={customStyle} value={productividades} dataKey="idEmpleado" filters={filters} filterDisplay="row"
-                        globalFilterFields={['idSecuencia', 'coordinador', 'inicio', 'final', 'frecuencia', 'estado']} header={header} emptyMessage="No data found.">
+                        globalFilterFields={['idPlanificacion', 'coordinador', 'inicio', 'final', 'estatus', 'frecuencia']} header={header} emptyMessage="No data found.">
                         <Column
                             field="idPlanificacion"
                             header="ID de Secuencia"
-                            body={(rowData) => {
-                                const idWithPadding = String(rowData.idPlanificacion).padStart(6, '0');
-                                return <a onClick={() => navigate(`${rutaServidor}/Nomina/Componentes/DetalleNomina`, { state: { productividad: rowData } })} style={{ color: '#007bff', cursor: 'pointer' }}>{idWithPadding}</a>
-                            }}
+                            body=
+                            {
+                                (rowData) => {
+                                    const idWithPadding = String(rowData.idPlanificacion).padStart(6, '0');
+                                    return <a onClick={() => navigate(`${rutaServidor}/Nomina/Componentes/DetalleNomina`, { state: { productividad: rowData } })} style={{ color: '#007bff', cursor: 'pointer' }}>{idWithPadding}</a>
+                                }
+                            }
                             filter
                             filterPlaceholder="Buscar por Id de Secuencia"
                             style={{ minWidth: '12rem' }}

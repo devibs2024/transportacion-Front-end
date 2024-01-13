@@ -1,4 +1,4 @@
- const obtenerPrimerosNElementos = (array, n) => array.slice(0, n);
+const obtenerPrimerosNElementos = (array, n) => array.slice(0, n);
 
 const obtenerMensajesDeError = (errorObj) => errorObj.errors;
 
@@ -6,28 +6,28 @@ const concatenarMensajesDeError = (mensajes) => mensajes.join('');
 
 const procesarErrorIndividual = (errorObj, maxMensajes) => {
 
-  const mensajes = obtenerMensajesDeError(errorObj);
-  const primerosMensajes = obtenerPrimerosNElementos(mensajes, maxMensajes);
+    const mensajes = obtenerMensajesDeError(errorObj);
+    const primerosMensajes = obtenerPrimerosNElementos(mensajes, maxMensajes);
 
-  return concatenarMensajesDeError(primerosMensajes);
+    return concatenarMensajesDeError(primerosMensajes);
 };
 
- export const procesarErrores = (errores, maxErrores = 3, maxMensajesPorError = 2) => {
+export const procesarErrores = (errores, maxErrores = 3, maxMensajesPorError = 2) => {
 
-  let mensajeFinal = "";
+    let mensajeFinal = "";
 
-  if (!Array.isArray(errores)) {
-    errores = [errores];
-  }
+    if (!Array.isArray(errores)) {
+        errores = [errores];
+    }
 
-  const primerosErrores = obtenerPrimerosNElementos(errores, maxErrores);
+    const primerosErrores = obtenerPrimerosNElementos(errores, maxErrores);
 
-  primerosErrores.forEach((errorObj) => {
+    primerosErrores.forEach((errorObj) => {
 
-    mensajeFinal += procesarErrorIndividual(errorObj, maxMensajesPorError);
+        mensajeFinal += procesarErrorIndividual(errorObj, maxMensajesPorError);
 
-  });
+    });
 
-  return mensajeFinal;
+    return mensajeFinal;
 };
 
