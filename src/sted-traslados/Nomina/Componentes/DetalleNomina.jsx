@@ -8,6 +8,7 @@ import { useLocation } from "react-router-dom";
 
 import { useFormik } from "formik";
 import { Form, Modal } from "react-bootstrap";
+import { ModalComprobanteNomina } from "./ModalComprobanteNomina";
 
 import { FilterMatchMode } from "primereact/api";
 import { Toolbar } from "primereact/toolbar";
@@ -24,7 +25,7 @@ import { accionFallida } from '../../../shared/Utils/modals';
 import { useGetEmpleadoCoordinadores } from "../../../hooks/useGetEmpleadoCoordinador";
 import { useGetTiendaCoordinadores } from "../../../hooks/useGetTiendaCoordinador";
 
-export const PantallaDetalleNomina = (setNomina, nomina) => {
+export const PantallaDetalleNomina = () => {
 
     //####################################################################################################################################################
     //### VARIABLES GLOBALES
@@ -32,12 +33,16 @@ export const PantallaDetalleNomina = (setNomina, nomina) => {
     const navigate = useNavigate();
     const location = useLocation();
 
+    const [show, setShow] = useState(false);
     const [error, setError] = useState(null);
 
     const [productividades, setProductividades] = useState([]);
-    const [volantes, setVolantes] = useState([]);
+    const [comprobantes, setComprobantes] = useState([]);
+    const [comprobante, setComprobante] = useState([]);
 
     const idCoordinador = decodeToken.tokenDecode();
+
+    const handleShow = () => setShow(true);
 
     //####################################################################################################################################################
     //### EVENTOS
@@ -86,6 +91,11 @@ export const PantallaDetalleNomina = (setNomina, nomina) => {
         },
     });
 
+    const openComprobante = (row) => {
+
+        setComprobante(row)
+        setShow(true)
+    }
 
     //####################################################################################################################################################
     //### API
@@ -98,7 +108,7 @@ export const PantallaDetalleNomina = (setNomina, nomina) => {
             const response = await API.get(`CalculoNomina/${Number(datos.idPlanificacion)},${datos.fechaDesde},${datos.fechaHasta},${Number(datos.idCoordinador)},${Number(datos.idOperador)},${Number(datos.idTienda)}`);
 
             if (response.status == 200 || response.status == 204)
-                setVolantes(response.data);
+                setComprobantes(response.data);
             else
                 accionFallida({ titulo: 'E R R O R', mensaje: 'NO SE PUDO PROCESAR' });
 
@@ -209,7 +219,7 @@ export const PantallaDetalleNomina = (setNomina, nomina) => {
         import('jspdf').then((jsPDF) => {
             import('jspdf-autotable').then(() => {
                 const doc = new jsPDF.default(0, 0);
-                doc.autoTable(exportColumns, volantes);
+                doc.autoTable(exportColumns, comprobantes);
                 doc.save('Nomina.pdf');
             });
         });
@@ -219,7 +229,7 @@ export const PantallaDetalleNomina = (setNomina, nomina) => {
 
     const exportExcel = () => {
         import('xlsx').then((xlsx) => {
-            const worksheet = xlsx.utils.json_to_sheet(volantes);
+            const worksheet = xlsx.utils.json_to_sheet(comprobantes);
             const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
             const excelBuffer = xlsx.write(workbook, {
                 bookType: 'xlsx',
@@ -253,6 +263,13 @@ export const PantallaDetalleNomina = (setNomina, nomina) => {
         return (
 
             <Form onSubmit={formik.handleSubmit}>
+
+                <ModalComprobanteNomina
+                    show={show}
+                    setShow={setShow}
+                    comprobante={comprobante}
+                    setcomprobante={setComprobante}
+                />
 
                 <div className='flex flex-wrap gap-2'>
 
@@ -366,13 +383,17 @@ export const PantallaDetalleNomina = (setNomina, nomina) => {
 
     const renderHeader = () => {
         return (
+
             <div className="d-flex justify-content-between">
+
                 <Button type="button" icon="pi pi-filter-slash" severity="secondary" label="Quitar Filtros" style={{ marginRight: "5px" }} outlined onClick={clearFilter}></Button>
                 <span className="p-input-icon-left">
                     <i className="pi pi-search"></i>
                     <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Buscar..."></InputText>
                 </span>
+
             </div>
+
         )
     };
 
@@ -381,7 +402,9 @@ export const PantallaDetalleNomina = (setNomina, nomina) => {
     //### PANTALLA | LISTADO | BODY
 
     return (
+
         <div className="mt-5">
+
             <CustomCard title="Calculo de Nomina">
                 <div className="p-3">
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
@@ -392,14 +415,27 @@ export const PantallaDetalleNomina = (setNomina, nomina) => {
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} rows"
                         ref={dt}
                         style={customStyle}
-                        value={volantes}
+                        value={comprobantes}
                         dataKey="idEmpleado"
                         filters={filters}
                         filterDisplay="row"
                         globalFilterFields={['idOperador', 'operador']}
                         header={header}
                         emptyMessage="No data found.">
-                        <Column field="idOperador" header="ID Sec." filter filterPlaceholder="Buscar por id secuencia" style={{ minWidth: '12rem' }}></Column>
+                        <Column
+                            field="idOperador"
+                            header="ID de Secuencia"
+                            body=
+                            {
+                                (rowData) => {
+                                    const _idOperador = String(rowData.idOperador).padStart(6, '0');
+                                    return <a onClick={() => openComprobante(rowData)} style={{ color: '#007bff', cursor: 'pointer' }}>{_idOperador}</a>
+                                }
+                            }
+                            filter
+                            filterPlaceholder="Buscar por Id de Secuencia"
+                            style={{ minWidth: '12rem' }}
+                        />
                         <Column field="operador" header="Operador" filter filterPlaceholder="Buscar por operador" style={{ minWidth: '12rem' }}></Column>
                         <Column field="spot" header="Spot" style={{ minWidth: '12rem' }}></Column>
                         <Column field="banco" header="Banco" style={{ minWidth: '12rem' }}></Column>
@@ -418,6 +454,7 @@ export const PantallaDetalleNomina = (setNomina, nomina) => {
                     </DataTable>
                 </div>
             </CustomCard>
+
         </div>
     );
 

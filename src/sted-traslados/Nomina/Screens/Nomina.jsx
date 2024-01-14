@@ -26,7 +26,7 @@ export const PantallaNomina = () => {
 
     const [error, setError] = useState(null);
 
-    const [productividades, setProductividades] = useState([]);
+    const [productividades, setProductividades] = useState([]); 
 
     //####################################################################################################################################################
     //### EVENTOS
@@ -239,7 +239,7 @@ export const PantallaNomina = () => {
                             filter
                             filterPlaceholder="Buscar por Id de Secuencia"
                             style={{ minWidth: '12rem' }}
-                        />
+                        />                       
                         <Column field="coordinador" header="Coordinador" filter filterPlaceholder="Buscar por el nombre del Coordinador" style={{ minWidth: '12rem' }} />
                         <Column field="fechaDesde" header="Inicio" body={(rowData) => rowData.fechaDesde.substring(0, 10)} filter filterPlaceholder="Buscar por el fecha de Inicio" style={{ minWidth: '12rem' }} />
                         <Column field="fechaHasta" header="Final" body={(rowData) => rowData.fechaHasta.substring(0, 10)} filter filterPlaceholder="Buscar por fecha de Finalización" style={{ minWidth: '12rem' }} />
