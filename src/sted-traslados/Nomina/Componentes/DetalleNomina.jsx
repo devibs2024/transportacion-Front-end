@@ -20,7 +20,7 @@ import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import DatePicker from 'react-datepicker';
 
-import { accionFallida } from '../../../shared/Utils/modals';
+import { accionExitosa, accionFallida } from '../../../shared/Utils/modals';
 
 import { useGetEmpleadoCoordinadores } from "../../../hooks/useGetEmpleadoCoordinador";
 import { useGetTiendaCoordinadores } from "../../../hooks/useGetTiendaCoordinador";
@@ -36,38 +36,43 @@ export const PantallaDetalleNomina = () => {
     const [show, setShow] = useState(false);
     const [error, setError] = useState(null);
 
-    const [productividades, setProductividades] = useState([]);
+    const [productividad, setProductividad] = useState([]);
     const [comprobantes, setComprobantes] = useState([]);
     const [comprobante, setComprobante] = useState([]);
+    const [nomina, setNomina] = useState([]);
 
     const idCoordinador = decodeToken.tokenDecode();
+    const idProcesoNomina = 0
 
     const handleShow = () => setShow(true);
 
     //####################################################################################################################################################
     //### EVENTOS
 
+    //### ENTORNO
+
     useEffect(() => {
 
         if (location.state?.productividad) {
+
             formik.setValues(location.state.productividad);
-            setProductividades(location.state.productividad)
+            setProductividad(location.state.productividad);
         }
-        else {
+        else
             accionFallida({ titulo: 'E R R O R', mensaje: 'FALTA INFORMACIÓN' });
-        }
 
     }, []);
 
     const getInitialValues = () => {
 
         return {
-            idPlanificacion: 0,
-            idCoordinador: 0,
+            idProcesoNomina: 0,
+            idPlanificacion: productividad.idPlanificacion,
+            idCoordinador: productividad.idCoordinador,
             idOperador: 0,
             idTienda: 0,
-            fechaDesde: '',
-            fechaHasta: ''
+            fechaDesde: productividad.fechaDesde,
+            fechaHasta: productividad.fechaHasta
         }
 
     }
@@ -77,48 +82,161 @@ export const PantallaDetalleNomina = () => {
         Form,
         onSubmit: values => {
 
+            let idProcesoNomina = 0
+
             let nomina = {
-                idPlanificacion: productividades.idPlanificacion,
-                idCoordinador: productividades.idCoordinador,
+                idProcesoNomina: 0,
+                idPlanificacion: productividad.idPlanificacion,
+                idCoordinador: productividad.idCoordinador,
                 idOperador: isNaN(values.idOperador) ? 0 : values.idOperador,
                 idTienda: isNaN(values.idTienda) ? 0 : values.idTienda,
-                fechaDesde: values.fechaDesde,
-                fechaHasta: values.fechaHasta
+                fechaIni: values.fechaDesde,
+                fechaEnd: values.fechaHasta,
+                procesado: false
             };
 
+            setNomina(nomina);
             getCalculoNomina(nomina);
 
         },
     });
 
+    const getComprobanteNomina = () => {
+
+        let idProcesoNomina = 0
+
+        let nomina = {
+            idProcesoNomina: 0,
+            idPlanificacion: productividad.idPlanificacion,
+            idCoordinador: productividad.idCoordinador,
+            idOperador: isNaN(formik.values.idOperador) ? 0 : formik.values.idOperador,
+            idTienda: isNaN(formik.values.idTienda) ? 0 : formik.values.idTienda,
+            fechaIni: formik.values.fechaDesde,
+            fechaEnd: formik.values.fechaHasta,
+            procesado: false
+        };
+
+        setNomina(nomina);
+        getConsultaNomina(nomina);
+    }
+
+    const postProcesoNomina = () => {
+
+        if (comprobantes.length > 0) {
+
+            let nomina = {
+                idProcesoNomina: comprobantes[0].idProcesoNomina,
+                idPlanificacion: productividad.idPlanificacion,
+                idCoordinador: productividad.idCoordinador,
+                idOperador: isNaN(formik.values.idOperador) ? 0 : formik.values.idOperador,
+                idTienda: isNaN(formik.values.idTienda) ? 0 : formik.values.idTienda,
+                fechaIni: formik.values.fechaDesde,
+                fechaEnd: formik.values.fechaHasta,
+                procesado: true
+            };
+
+            setNomina(nomina)
+            postPago(nomina)
+
+        }
+        else {
+            accionFallida({ titulo: 'E R R O R', mensaje: "Debe generar un cálculo de nómina" });
+        }
+
+    }
+
+    //### LISTADO
+
     const openComprobante = (row) => {
 
-        setComprobante(row)
-        setShow(true)
+        setComprobante(row);
+        setShow(true);
     }
 
     //####################################################################################################################################################
     //### API
 
 
-    const getCalculoNomina = async (datos) => {
+    const getCalculoNomina = async (pNomina) => {
 
         try {
 
-            const response = await API.get(`CalculoNomina/${Number(datos.idPlanificacion)},${datos.fechaDesde},${datos.fechaHasta},${Number(datos.idCoordinador)},${Number(datos.idOperador)},${Number(datos.idTienda)}`);
+            setComprobantes([])
+
+            const response = await API.get(`Nomina/Calculo/${Number(pNomina.idPlanificacion)},${pNomina.fechaIni},${pNomina.fechaEnd},${Number(pNomina.idCoordinador)},${Number(pNomina.idOperador)},${Number(pNomina.idTienda)}`);
 
             if (response.status == 200 || response.status == 204)
                 setComprobantes(response.data);
-            else
-                accionFallida({ titulo: 'E R R O R', mensaje: 'NO SE PUDO PROCESAR' });
 
         }
-        catch (e) {
-            setError(e.response.data)
-            accionFallida({ titulo: 'E R R O R', mensaje: JSON.stringify(e.response.data) });
+        catch (er) {
+
+            if (er.response?.data) {
+                setError(er.response.data);
+                accionFallida({ titulo: 'E R R O R', mensaje: JSON.stringify(er.response.data) });
+            }
+            else {
+                accionFallida({ titulo: 'E R R O R', mensaje: er.message });
+            }
+
         }
     }
 
+    const getConsultaNomina = async (pNomina) => {
+
+        try {
+
+            setComprobantes([])
+
+            const response = await API.get(`Nomina/Consulta/${Number(pNomina.idProcesoNomina)},${Number(pNomina.idPlanificacion)},${pNomina.fechaIni},${pNomina.fechaEnd},${Number(pNomina.idCoordinador)},${Number(pNomina.idOperador)},${Number(pNomina.idTienda)}`);
+
+            if (response.status == 200 || response.status == 204)
+                setComprobantes(response.data);
+
+        }
+        catch (er) {
+
+            setComprobantes([])
+
+            if (er.response?.data) {
+                setError(er.response.data)
+                accionFallida({ titulo: 'E R R O R', mensaje: JSON.stringify(er.response.data) });
+            }
+            else {
+                accionFallida({ titulo: 'E R R O R', mensaje: er.message });
+            }
+
+        }
+    }
+
+    const postPago = async (pNomina) => {
+
+        try {
+
+            console.log(pNomina)
+
+            const response = await API.put(`Nomina/Pago/${Number(pNomina.idProcesoNomina)}`, pNomina);
+
+            if (response.status == 200 || response.status == 204) {
+
+                setComprobantes([])
+                accionExitosa({ titulo: 'E X I T O', mensaje: "Nómina pagada" })
+
+            }
+        }
+        catch (er) {
+
+            if (er.response?.data) {
+                setError(er.response.data)
+                accionFallida({ titulo: 'E R R O R', mensaje: JSON.stringify(er.response.data) });
+            }
+            else {
+                accionFallida({ titulo: 'E R R O R', mensaje: er.message });
+            }
+
+        }
+
+    }
 
     //####################################################################################################################################################
     //### COMBOS
@@ -353,13 +471,34 @@ export const PantallaDetalleNomina = () => {
 
                     <div className='col col-sm-6'>
                         <Button
-                            type="submit"
-                            style={{ backgroundColor: "#2596BE", borderColor: "#2596BE", width: "193px", height: "43px", marginLeft: "0px" }}
-                            label="Genera Cálculo"
+                            type="button"
+                            style={{ backgroundColor: "#2596BE", borderColor: "#2596BE", width: "120px", height: "43px", marginLeft: "0px" }}
+                            onClick={() => getComprobanteNomina()}
+                            label="Consulta"
                             icon="pi pi-plus right"
                             iconPos="right"
                         >
                         </Button>
+                        &nbsp;
+                        <Button
+                            type="submit"
+                            style={{ backgroundColor: "#2596BE", borderColor: "#2596BE", width: "120px", height: "43px", marginLeft: "0px" }}
+                            label="Cálculo"
+                            icon="pi pi-plus right"
+                            iconPos="right"
+                        >
+                        </Button>
+                        &nbsp;
+                        <Button
+                            type="button"
+                            style={{ backgroundColor: "#2596BE", borderColor: "#2596BE", width: "120px", height: "43px", marginLeft: "0px" }}
+                            onClick={() => postProcesoNomina()}
+                            label="Pago"
+                            icon="pi pi-plus right"
+                            iconPos="right"
+                        >
+                        </Button>
+
                     </div>
 
                 </div>
