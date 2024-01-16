@@ -22,36 +22,25 @@ export const ModalComprobanteNomina = ({ show, setShow, comprobante, setComproba
             idComprobanteNomina: 0
         },
         onSubmit: values => {
-
-            //imprimirElemento();
-            var ficha = document.getElementById("printPdf")
-
-            var ventimp = window.open(' ', 'popimpr');
-            ventimp.document.write(ficha.innerHTML);
-            ventimp.document.close();
-            ventimp.print();
-            ventimp.close();
+            printElement(document.getElementById("printPdf"));
         }
 
     });
 
-
-
-    function imprimirElemento() {
-
-        var elemento = document.getElementById("printPdf")
-        var ventana = window.open('', 'PRINT', 'height=400,width=600');
-        ventana.document.write('<html><head><title>' + document.title + '</title>');
-        ventana.document.write('</head><body >');
-        ventana.document.write(elemento.innerHTML);
-        ventana.document.write('</body></html>');
-        ventana.document.close();
-        ventana.print();
-        ventana.close();
-
-        console.log(elemento)
-
-        return true;
+    function printElement(elem) {
+        var domClone = elem.cloneNode(true);
+        
+        var $printSection = document.getElementById("printSection");
+        
+        if (!$printSection) {
+            var $printSection = document.createElement("div");
+            $printSection.id = "printSection";
+            document.body.appendChild($printSection);
+        }
+        
+        $printSection.innerHTML = "";
+        $printSection.appendChild(domClone);
+        window.print();
     }
 
     const strMoneda = new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", minimumFractionDigits: 2, });
