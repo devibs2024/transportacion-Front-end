@@ -17,32 +17,41 @@ export const ModalComprobanteNomina = ({ show, setShow, comprobante, setComproba
     }, []);
 
     const formik = useFormik({
+
         initialValues: {
             idComprobanteNomina: 0
         },
         onSubmit: values => {
 
-            printElement(document.getElementById("printPdf"));
+            //imprimirElemento();
+            var ficha = document.getElementById("printPdf")
 
+            var ventimp = window.open(' ', 'popimpr');
+            ventimp.document.write(ficha.innerHTML);
+            ventimp.document.close();
+            ventimp.print();
+            ventimp.close();
         }
+
     });
 
-    const printElement = (elem) => {
 
-        //import('jspdf').then((jsPDF) => {
-        //    import('jspdf-autotable').then(() => {
-        //        const doc = new jsPDF.default(0, 0);
-        //        doc.innerHTML(elem.innerHTML)
-        //        doc.save('ComprobanteNomina.pdf');
-        //    });
-        //});
 
-        //var ventimp = window.open(' ', 'popimpr');
-        //ventimp.document.write(elem.innerHTML);
-        //ventimp.document.close();
-        //ventimp.print();
-        //ventimp.close();
+    function imprimirElemento() {
 
+        var elemento = document.getElementById("printPdf")
+        var ventana = window.open('', 'PRINT', 'height=400,width=600');
+        ventana.document.write('<html><head><title>' + document.title + '</title>');
+        ventana.document.write('</head><body >');
+        ventana.document.write(elemento.innerHTML);
+        ventana.document.write('</body></html>');
+        ventana.document.close();
+        ventana.print();
+        ventana.close();
+
+        console.log(elemento)
+
+        return true;
     }
 
     const strMoneda = new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", minimumFractionDigits: 2, });
@@ -56,9 +65,10 @@ export const ModalComprobanteNomina = ({ show, setShow, comprobante, setComproba
     };
 
     return (
-        <div id="printPdf">
 
-            <Modal show={show} onHide={handleClose}>
+        <Modal show={show} onHide={handleClose}>
+
+            <div id="printPdf">
 
                 <Form onSubmit={formik.handleSubmit}>
 
@@ -212,8 +222,9 @@ export const ModalComprobanteNomina = ({ show, setShow, comprobante, setComproba
                     </Modal.Footer>
                 </Form>
 
-            </Modal>
+            </div>
 
-        </div>
+        </Modal>
+
     );
 }
