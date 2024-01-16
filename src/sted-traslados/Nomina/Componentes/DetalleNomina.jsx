@@ -34,7 +34,7 @@ export const PantallaDetalleNomina = () => {
     const location = useLocation();
 
     const [show, setShow] = useState(false);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState(null); 
 
     const [productividad, setProductividad] = useState([]);
     const [comprobantes, setComprobantes] = useState([]);
@@ -212,8 +212,6 @@ export const PantallaDetalleNomina = () => {
     const postPago = async (pNomina) => {
 
         try {
-
-            console.log(pNomina)
 
             const response = await API.put(`Nomina/Pago/${Number(pNomina.idProcesoNomina)}`, pNomina);
 
