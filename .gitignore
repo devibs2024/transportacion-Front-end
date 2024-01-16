@@ -2,4 +2,3 @@ build
 node_modules
 /.vs
 /transportacion-Front-end.sln
-/src/sted-traslados/Nomina/Componentes/DetalleNomina.jsx
