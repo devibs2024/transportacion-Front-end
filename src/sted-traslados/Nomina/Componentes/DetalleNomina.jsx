@@ -10,12 +10,11 @@ import { useFormik } from "formik";
 import { Form, Modal } from "react-bootstrap";
 import { ModalComprobanteNomina } from "./ModalComprobanteNomina";
 
-import { FilterMatchMode } from "primereact/api";
 import { Toolbar } from "primereact/toolbar";
+import { CustomCard } from "../../../shared/card-custom";
+import { FilterMatchMode } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-
-import { CustomCard } from "../../../shared/card-custom";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import DatePicker from 'react-datepicker';
@@ -27,8 +26,10 @@ import { useGetTiendaCoordinadores } from "../../../hooks/useGetTiendaCoordinado
 
 export const PantallaDetalleNomina = () => {
 
+
     //####################################################################################################################################################
     //### VARIABLES GLOBALES
+
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -46,10 +47,10 @@ export const PantallaDetalleNomina = () => {
 
     const handleShow = () => setShow(true);
 
+
     //####################################################################################################################################################
     //### EVENTOS
 
-    //### ENTORNO
 
     useEffect(() => {
 
@@ -152,6 +153,7 @@ export const PantallaDetalleNomina = () => {
         setComprobante(row);
         setShow(true);
     }
+
 
     //####################################################################################################################################################
     //### API
@@ -542,7 +544,7 @@ export const PantallaDetalleNomina = () => {
 
         <div className="mt-5">
 
-            <CustomCard title="Calculo de Nomina">
+            <CustomCard  title="Calculo de Nomina">
                 <div className="p-3">
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
                     <DataTable

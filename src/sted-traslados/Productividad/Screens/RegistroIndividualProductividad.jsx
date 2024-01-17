@@ -1,23 +1,25 @@
+import API from "../../../store/api";
+
 import React, { useState, useEffect, useRef } from 'react';
+
+import { useLocation, useNavigate } from 'react-router-dom';
+import { rutaServidor } from '../../../routes/rutaServidor';
+
+import { Form, Modal } from 'react-bootstrap';
+import { ModalCrearEjecucionPlanificacion } from './ModalCrearEjecucionPlanificacion';
+
+import { Toolbar } from 'primereact/toolbar';
+import { CustomCard } from '../../../shared/card-custom';
 import { FilterMatchMode } from 'primereact/api';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
-import { TriStateCheckbox } from 'primereact/tristatecheckbox';
-import API from '../../../store/api';
 import { Button } from 'primereact/button';
-import { accionExitosa, accionFallida, confirmarAccion } from '../../../shared/Utils/modals';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { Toolbar } from 'primereact/toolbar';
-import { CustomCard } from '../../../shared/card-custom';
-import { rutaServidor } from '../../../routes/rutaServidor';
-import { Link } from 'react-router-dom';
 import { Calendar } from 'primereact/calendar';
 import { Dropdown } from 'primereact/dropdown';
+
+import { accionExitosa, accionFallida, confirmarAccion } from '../../../shared/Utils/modals';
 import { procesarErrores } from '../../../shared/Utils/procesarErrores';
-import { ModalCrearEjecucionPlanificacion } from './ModalCrearEjecucionPlanificacion';
-import { Modal } from 'bootstrap';
-import { Form } from 'react-bootstrap';
 
 export const PantallaRegistroIndividualProductividad = () => {
 
@@ -25,18 +27,18 @@ export const PantallaRegistroIndividualProductividad = () => {
     const [selectedStore, setSelectedStore] = useState(null);
     const [changedCells, setChangedCells] = useState([]);
     //const [idOperador, setIdOperador] = useState(0);
-    
+
 
     const [show, setShow] = useState(false);
     const handleShow = () => setShow(true);
     const handleClose = () => setShow(false);
     const [planificacionEjecucion, setPlanificacionEjecucion] = useState({});
     const [idOperador, setIdOperador] = useState(0);
-     
-   // const [detallesGeneralesPlanificacion, setDetallesGeneralesPlanificacion] = useState([]);
+
+    // const [detallesGeneralesPlanificacion, setDetallesGeneralesPlanificacion] = useState([]);
 
 
-   //  const [detallesPlanificacion, setDetallesPlanificacion] = useState([]);
+    //  const [detallesPlanificacion, setDetallesPlanificacion] = useState([]);
 
 
     const stores = [
@@ -73,7 +75,7 @@ export const PantallaRegistroIndividualProductividad = () => {
     }, [])
 
     const getProductividades = async (idPlanificacion, idOperador) => {
-        
+
         const response = await API.get(`Productividad/${idPlanificacion},${Number(idOperador)}`);
 
         if (response.status == 200 || response.status == 204) {
@@ -290,7 +292,7 @@ export const PantallaRegistroIndividualProductividad = () => {
         return (<>
             <div className="flex flex-wrap gap-3 justify-content-center justify-content-between">
                 {/* <Button style={{ backgroundColor: "#2596be", borderColor: "#2596be" }} label="Nuevo Registro" onClick={() => navigate(rutaServidor + "/operador/crear")} /> */}
-                <Button style={{ backgroundColor: "#2596be", borderColor: "#2596be" }} label="Nuevo Registro" onClick={() => navigate( rutaServidor + "/registroIndividualProductividad/ModalCrearEjecucionPlanificacion")} />
+                <Button style={{ backgroundColor: "#2596be", borderColor: "#2596be" }} label="Nuevo Registro" onClick={() => navigate(rutaServidor + "/registroIndividualProductividad/ModalCrearEjecucionPlanificacion")} />
                 <Button style={{ backgroundColor: "#2596be", borderColor: "#2596be" }} label="Guardar" onClick={() => guardarProductividades()} />
                 <Button style={{ backgroundColor: "#2596be", borderColor: "#2596be" }} label="Cancelar" onClick={() => cancelarProductividades()} />
             </div>
@@ -348,14 +350,14 @@ export const PantallaRegistroIndividualProductividad = () => {
 
     return (
         <>
-          <ModalCrearEjecucionPlanificacion 
-                        show={show}
-                        setShow={setShow}
-                        detallePlanificacion={planificacionEjecucion}
-                        getDetallesPlanificacion={getProductividades}
-                        setDetallePlanificacion={setPlanificacionEjecucion}
-                        setDetallesPlanificacion={setProductividades}
-                    />
+            <ModalCrearEjecucionPlanificacion
+                show={show}
+                setShow={setShow}
+                detallePlanificacion={planificacionEjecucion}
+                getDetallesPlanificacion={getProductividades}
+                setDetallePlanificacion={setPlanificacionEjecucion}
+                setDetallesPlanificacion={setProductividades}
+            />
             <div className="mt-5">
                 <CustomCard title="Registro Individual de Productividad" >
                     <div className="p-3">
