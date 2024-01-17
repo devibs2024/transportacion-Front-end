@@ -182,6 +182,7 @@ export const PantallaDetalleNomina = () => {
             }
 
         }
+
     }
 
     const getConsultaNomina = async (pNomina) => {
@@ -251,36 +252,25 @@ export const PantallaDetalleNomina = () => {
 
 
     const cols = [
-        { field: 'IdCoordinador', header: 'Id Secuencia' },
-        { field: 'Coordinador', header: 'Coordinador' },
-
-        { field: 'IdOperador', header: 'IdOperador' },
+        { field: 'IdOperador', header: 'Id Secuencia' },
         { field: 'Operador', header: 'Operador' },
-
-        { field: 'IdSegmento', header: 'IdSegmento' },
-        { field: 'Segmento', header: 'Segmento' },
         { field: 'Spot', header: 'Spot' },
-
-        { field: 'Tarjeta', header: 'Tarjeta' },
-        { field: 'IdBanco', header: 'IdBanco' },
         { field: 'Banco', header: 'Banco' },
-
-        { field: 'Salario', header: 'Salario' },
-        { field: 'SMG', header: 'SMG' },
-
-        { field: 'IdTienda', header: 'Tienda' },
-        { field: 'Tienda', header: 'Tienda' },
-        { field: 'IdZonaSted', header: 'Tienda' },
-        { field: 'ZonaSted', header: 'ZonaSted' },
+        { field: 'Tarjeta', header: 'Tarjeta' },
 
         { field: 'Dias', header: 'Dias' },
 
-        { field: 'SubTotal1', header: 'SubTotal1' },
+        { field: 'Salario', header: 'Sueldo' },
+        { field: 'SubTotal1', header: 'SubTotal' },
+
         { field: 'Descuento', header: 'Descuento' },
         { field: 'Bono', header: 'Bono' },
         { field: 'Gasolina', header: 'Gasolina' },
-        { field: 'SubTotal2', header: 'SubTotal2' },
+        { field: 'SubTotal2', header: 'Subtotal' },
+
+        { field: 'SMG', header: 'SMG' },
         { field: 'Total', header: 'Total' },
+
         { field: 'STED', header: 'STED' },
         { field: 'Pago', header: 'Pago' },
     ];
@@ -324,7 +314,6 @@ export const PantallaDetalleNomina = () => {
 
 
     const exportColumns = cols.map((col) => ({ title: col.header, datakey: col.field }));
-
     const customStyle = { backgroundColor: '#F2F2F2' };
 
     //### LISTADO | EXPORTAR - CSV
@@ -505,8 +494,8 @@ export const PantallaDetalleNomina = () => {
 
             </Form>
 
-        )
-    }
+        );
+    };
 
     const rightToolbarTemplate = () => {
         return (
@@ -533,7 +522,7 @@ export const PantallaDetalleNomina = () => {
 
             </div>
 
-        )
+        );
     };
 
     const header = renderHeader();

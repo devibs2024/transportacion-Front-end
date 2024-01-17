@@ -5,6 +5,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { rutaServidor } from '../../../routes/rutaServidor';
 
+import { useFormik } from "formik";
 import { Form, Modal } from 'react-bootstrap';
 import { ModalCrearEjecucionPlanificacion } from './ModalCrearEjecucionPlanificacion';
 
@@ -23,29 +24,152 @@ import { procesarErrores } from '../../../shared/Utils/procesarErrores';
 
 export const PantallaRegistroIndividualProductividad = () => {
 
-    const [productividades, setProductividades] = useState([]);
-    const [selectedStore, setSelectedStore] = useState(null);
-    const [changedCells, setChangedCells] = useState([]);
-    //const [idOperador, setIdOperador] = useState(0);
 
+    //####################################################################################################################################################
+    //### VARIABLES GLOBALES
+
+
+    const navigate = useNavigate();
+    const location = useLocation();
 
     const [show, setShow] = useState(false);
+    const [error, setError] = useState(null);
+
+    const [detalle, setDetalle] = useState([]);
+    const [ejecuciones, setEjecuciones] = useState([]);
+
+    const [selectedStore, setSelectedStore] = useState(null);
+    const [changedCells, setChangedCells] = useState([]);
+
+    const [planificacionEjecucion, setPlanificacionEjecucion] = useState({});
+
     const handleShow = () => setShow(true);
     const handleClose = () => setShow(false);
-    const [planificacionEjecucion, setPlanificacionEjecucion] = useState({});
-    const [idOperador, setIdOperador] = useState(0);
-
-    // const [detallesGeneralesPlanificacion, setDetallesGeneralesPlanificacion] = useState([]);
 
 
-    //  const [detallesPlanificacion, setDetallesPlanificacion] = useState([]);
+    //####################################################################################################################################################
+    //### EVENTOS
 
 
-    const stores = [
-        { label: 'Tienda 1', value: 'tienda1' },
-        { label: 'Tienda 2', value: 'tienda2' },
-        // ... your stores
-    ];
+    useEffect(() => {
+
+        if (location.state?.detalle) {
+
+            formik.setValues(location.state.detalle);
+            setDetalle(location.state.detalle);
+
+            getEjecuciones(location.state?.detalle)
+
+        }
+        else
+            accionFallida({ titulo: 'E R R O R', mensaje: 'FALTA INFORMACIÓN' });
+
+    }, [])
+
+    const getInitialValues = () => {
+
+        return {
+            idPlantificacion: 0,
+            idDetallePlanificacion: 0
+        }
+
+    }
+
+    const formik = useFormik({
+        initialValues: getInitialValues(),
+        Form,
+        onSubmit: values => {
+
+        },
+    });
+
+    const guardarEjecucion = () => {
+
+        changedCells.forEach(item => {
+            postEjecucion(item);
+        });
+    }
+
+    const cancelarEjecucion = () => {
+
+        setChangedCells([]);
+
+    }
+
+
+    //####################################################################################################################################################
+    //### FUNCIONES
+
+    const obtenerFechaFormateada = (fecha) => {
+
+        const horas = fecha.getHours().toString().padStart(2, '0');
+        const minutos = fecha.getMinutes().toString().padStart(2, '0');
+
+        return `${horas}:${minutos}:00`;
+    }
+
+    const obtenerFechaHoraFormateada = (fecha, hora) => {
+
+        const year = fecha.getFullYear();
+        const month = (fecha.getMonth() + 1).toString().padStart(2, '0');
+        const day = fecha.getDate().toString().padStart(2, '0');
+
+        return `${year}-${month}-${day}T${hora}`;
+    }
+
+    //####################################################################################################################################################
+    //### API
+
+    const getEjecuciones = async (pDetalle) => {
+
+        try {
+
+            const response = await API.get(`Productividad/${pDetalle.idPlanificacion},${Number(pDetalle.idOperador)}`);
+
+            if (response.status == 200 || response.status == 204) {
+                setEjecuciones(response.data);
+            }
+
+        }
+        catch (er) {
+
+            if (er.response?.data) {
+                setError(er.response.data);
+                accionFallida({ titulo: 'E R R O R', mensaje: JSON.stringify(er.response.data) });
+            }
+            else {
+                accionFallida({ titulo: 'E R R O R', mensaje: er.message });
+            }
+
+        }
+    }
+
+    const postEjecucion = async (ejecucion) => {
+
+        try {
+
+            const response = await API.post("EjecucionPlanificaciones", ejecucion);
+
+            if (response.status == 200 || response.status == 204) {
+
+                console.log('datos guardados')
+            }
+
+        } catch (e) {
+
+            accionFallida({ titulo: 'Ha ocurrido un error', mensaje: procesarErrores(e.response.data) })
+
+        }
+
+    }
+
+    //####################################################################################################################################################
+    //### COMBOS
+
+
+    //####################################################################################################################################################
+    //### LISTADO
+
 
     const cols = [
         { field: 'fecha', header: 'Fecha' },
@@ -60,29 +184,104 @@ export const PantallaRegistroIndividualProductividad = () => {
 
     const dt = useRef(null);
 
-    const exportColumns = cols.map((col) => ({ title: col.header, dataKey: col.field }));
+    const onStartTimeChange = (e, rowData) => {
 
-    const navigate = useNavigate();
+        rowData.horaInicioPlanificacion = obtenerFechaFormateada(e.value);
 
-    const location = useLocation();
+        let updatedProductividades = [...ejecuciones];
+        let index = updatedProductividades.findIndex(data => data.idDetallePlanificacion === rowData.idDetallePlanificacion);
+        updatedProductividades[index].horaInicioPlanificacion = rowData.horaInicioPlanificacion;
+        setEjecuciones(updatedProductividades);
 
-    useEffect(() => {
-        if (location.state?.productividad) {
-            getProductividades(location.state?.productividad.idPlanificacion, location.state.productividad.idOperador)
+        setChangedCells(prev => {
 
-            console.log(productividades)
-        }
-    }, [])
+            const index = prev.findIndex(el => el.idDetallePlanificacion === rowData.idDetallePlanificacion);
 
-    const getProductividades = async (idPlanificacion, idOperador) => {
+            if (index !== -1) {
+                return [
+                    ...prev.slice(0, index),
+                    rowData,
+                    ...prev.slice(index + 1)
+                ];
+            }
+            else {
+                return [...prev, rowData];
+            }
+        });
 
-        const response = await API.get(`Productividad/${idPlanificacion},${Number(idOperador)}`);
+    };
 
-        if (response.status == 200 || response.status == 204) {
+    const onEndTimeChange = (e, rowData) => {
 
-            setProductividades(response.data);
-        }
-    }
+        rowData.horaFinPlanificacion = obtenerFechaFormateada(e.value);
+
+        let updatedProductividades = [...ejecuciones];
+        let index = updatedProductividades.findIndex(data => data.idDetallePlanificacion === rowData.idDetallePlanificacion);
+        updatedProductividades[index].horaFinPlanificacion = rowData.horaFinPlanificacion;
+        setEjecuciones(updatedProductividades);
+
+        setChangedCells(prev => {
+
+            const index = prev.findIndex(el => el.idDetallePlanificacion === rowData.idDetallePlanificacion);
+
+            if (index !== -1) {
+                return [
+                    ...prev.slice(0, index),
+                    rowData,
+                    ...prev.slice(index + 1)
+                ];
+            }
+            else {
+                return [...prev, rowData];
+            }
+        });
+
+    };
+
+    const isCellChanged = (id) => {
+        return changedCells.find(cell => cell.id === id)?.changed;
+    };
+
+    const renderStartTimeEditor = (props) => {
+
+        return (
+            <Calendar
+                id={props.rowData.idDetallePlanificacion}
+                value={new Date(obtenerFechaHoraFormateada(new Date(props.rowData.fecha), props.rowData.horaInicioPlanificacion))}
+                appendTo={document.body}
+                onChange={(e) => onStartTimeChange(e, props.rowData)}
+                timeOnly
+                locale="es"
+                hourFormat="24"
+                dateFormat="HH:mm:ss"
+            />
+        );
+
+    };
+
+    const renderEndTimeEditor = (props) => {
+
+        return (
+            <Calendar
+                id={props.rowData.idDetallePlanificacion}
+                value={new Date(obtenerFechaHoraFormateada(new Date(props.rowData.fecha), props.rowData.horaFinPlanificacion))}
+                appendTo={document.body}
+                onChange={(e) => onEndTimeChange(e, props.rowData)}
+                timeOnly
+                locale="es"
+                hourFormat="24"
+                dateFormat="HH:mm:ss"
+            />
+        );
+
+    };
+
+
+    //####################################################################################################################################################
+    //### LISTADO | FILTROS
+
+
+    const [globalFilterValue, setGlobalFilterValue] = useState('');
 
     const [filters, setFilters] = useState({
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -93,121 +292,10 @@ export const PantallaRegistroIndividualProductividad = () => {
         frecuencia: { value: null, matchMode: FilterMatchMode.STARTS_WITH }
     });
 
-    const [globalFilterValue, setGlobalFilterValue] = useState('');
-
-    const obtenerFechaFormateada = (fecha) => {
-        const horas = fecha.getHours().toString().padStart(2, '0');
-        const minutos = fecha.getMinutes().toString().padStart(2, '0');
-        //   const segundos = fecha.getSeconds().toString().padStart(2, '0');
-
-        return `${horas}:${minutos}:00`;
-    }
-
-    const onStartTimeChange = (e, rowData) => {
-        let updatedProductividades = [...productividades];
-        let index = updatedProductividades.findIndex(data => data.idDetallePlanificacion === rowData.idDetallePlanificacion);
-        updatedProductividades[index].horaInicioPlanificacion = obtenerFechaFormateada(e.value);
-        setProductividades(updatedProductividades);
-
-
-        setChangedCells(prev => {
-
-            const index = prev.findIndex(el => el.idDetallePlanificacion === rowData.idDetallePlanificacion);
-
-            if (index !== -1) {
-                return [
-                    ...prev.slice(0, index),
-                    rowData,
-                    ...prev.slice(index + 1)
-                ];
-            }
-            else {
-                return [...prev, rowData];
-            }
-        });
-    };
-
-
-    const onEndTimeChange = (e, rowData) => {
-        let updatedProductividades = [...productividades];
-        let index = updatedProductividades.findIndex(data => data.idDetallePlanificacion === rowData.idDetallePlanificacion);
-        updatedProductividades[index].horaFinPlanificacion = obtenerFechaFormateada(e.value);
-        setProductividades(updatedProductividades);
-
-        setChangedCells(prev => {
-
-            const index = prev.findIndex(el => el.idDetallePlanificacion === rowData.idDetallePlanificacion);
-
-            if (index !== -1) {
-                return [
-                    ...prev.slice(0, index),
-                    rowData,
-                    ...prev.slice(index + 1)
-                ];
-            }
-            else {
-                return [...prev, rowData];
-            }
-        });
-    };
-
-    const isCellChanged = (id) => {
-        return changedCells.find(cell => cell.id === id)?.changed;
-    };
-
-    const onStoreChange = (e, rowData) => {
-        let updatedProductividades = [...productividades];
-        let index = updatedProductividades.findIndex(data => data.idDetallePlanificacion === rowData.idDetallePlanificacion);
-        updatedProductividades[index].nombreTienda = e.value;
-        setProductividades(updatedProductividades);
-
-        setChangedCells(prev => {
-
-            const index = prev.findIndex(el => el.idDetallePlanificacion === rowData.idDetallePlanificacion);
-
-            if (index !== -1) {
-                return [
-                    ...prev.slice(0, index),
-                    rowData,
-                    ...prev.slice(index + 1)
-                ];
-            }
-            else {
-                return [...prev, rowData];
-            }
-        });
-    };
-
-    const renderStartTimeEditor = (props, field) => {
-        return (
-            <Calendar id={props.rowData.idDetallePlanificacion} value={props.rowData[field]} appendTo={document.body}
-                onChange={(e) => onStartTimeChange(e, props.rowData)} timeOnly hourFormat="24" dateFormat="HH:mm:ss" />
-        );
-    };
-
-    const renderEndTimeEditor = (props, field) => {
-        return (
-            <Calendar id={props.rowData.idDetallePlanificacion} value={props.rowData[field]} appendTo={document.body}
-                onChange={(e) => onEndTimeChange(e, props.rowData)} timeOnly hourFormat="24" dateFormat="HH:mm:ss" />
-        );
-    };
-
-    const renderStoreEditor = (props, field) => {
-        return (
-            <Dropdown id={props.rowData.idDetallePlanificacion} value={props.rowData[field]} options={stores}
-                onChange={(e) => onStoreChange(e, props.rowData)} placeholder="Selecciona una tienda" />
-        );
-    };
-
-
     const onGlobalFilterChange = (e) => {
-
         const value = e.target.value;
-
         let _filters = { ...filters };
-
         _filters['global'].value = value;
-
         setFilters(_filters);
         setGlobalFilterValue(value);
     };
@@ -220,35 +308,26 @@ export const PantallaRegistroIndividualProductividad = () => {
             estado: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
             frecuencia: { value: null, matchMode: FilterMatchMode.EQUALS }
         });
-
         setGlobalFilterValue('')
     }
-    const clearFilter = () => {
-        initFilters();
-    };
 
-    const renderHeader = () => {
-        return (
-            <div className="d-flex justify-content-between">
-                <Button type="button" icon="pi pi-filter-slash" severity='secondary' label="Quitar Filtros" style={{ marginRight: "5px" }} outlined onClick={clearFilter} />
-                <span className="p-input-icon-left">
-                    <i className="pi pi-search" />
-                    <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Buscar..." />
-                </span>
-            </div>
-        );
-    };
+    const clearFilter = () => { initFilters(); };
 
 
-    const header = renderHeader();
+    //####################################################################################################################################################
+    //### LISTADO | EXPORTAR
 
-    const customStyle = {
-        backgroundColor: '#f2f2f2',
-    };
+
+    const exportColumns = cols.map((col) => ({ title: col.header, dataKey: col.field }));
+    const customStyle = { backgroundColor: '#f2f2f2' };
+
+    //### LISTADO | EXPORTAR - CSV
 
     const exportCSV = () => {
         dt.current.exportCSV();
     };
+
+    //### LISTADO | EXPORTAR - PDF
 
     const exportPdf = () => {
         import('jspdf').then((jsPDF) => {
@@ -256,16 +335,18 @@ export const PantallaRegistroIndividualProductividad = () => {
 
                 const doc = new jsPDF.default(0, 0);
 
-                doc.autoTable(exportColumns, productividades);
+                doc.autoTable(exportColumns, ejecuciones);
                 doc.save('Registro Individual de Productividad.pdf');
             });
         });
     };
 
+    //### LISTADO | EXPORTAR - EXCEL
+
     const exportExcel = () => {
 
         import('xlsx').then((xlsx) => {
-            const worksheet = xlsx.utils.json_to_sheet(productividades);
+            const worksheet = xlsx.utils.json_to_sheet(ejecuciones);
             const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
             const excelBuffer = xlsx.write(workbook, {
                 bookType: 'xlsx',
@@ -275,6 +356,7 @@ export const PantallaRegistroIndividualProductividad = () => {
             saveAsExcelFile(excelBuffer, 'Registro Individual de Productividad');
         });
     };
+
     const saveAsExcelFile = (buffer, fileName) => {
         import('file-saver').then((module) => {
             if (module && module.default) {
@@ -288,15 +370,35 @@ export const PantallaRegistroIndividualProductividad = () => {
             }
         });
     };
+
+
+    //####################################################################################################################################################
+    //### PANTALLA
+
+    //### PANTALLA | TOP
+
     const leftToolbarTemplate = () => {
-        return (<>
-            <div className="flex flex-wrap gap-3 justify-content-center justify-content-between">
-                {/* <Button style={{ backgroundColor: "#2596be", borderColor: "#2596be" }} label="Nuevo Registro" onClick={() => navigate(rutaServidor + "/operador/crear")} /> */}
-                <Button style={{ backgroundColor: "#2596be", borderColor: "#2596be" }} label="Nuevo Registro" onClick={() => navigate(rutaServidor + "/registroIndividualProductividad/ModalCrearEjecucionPlanificacion")} />
-                <Button style={{ backgroundColor: "#2596be", borderColor: "#2596be" }} label="Guardar" onClick={() => guardarProductividades()} />
-                <Button style={{ backgroundColor: "#2596be", borderColor: "#2596be" }} label="Cancelar" onClick={() => cancelarProductividades()} />
-            </div>
-        </>);
+        return (
+
+            <Form onSubmit={formik.handleSubmit}>
+
+                <ModalCrearEjecucionPlanificacion
+                    show={show}
+                    setShow={setShow}
+                    detallePlanificacion={planificacionEjecucion}
+                    getDetallesPlanificacion={getEjecuciones}
+                    setDetallePlanificacion={setPlanificacionEjecucion}
+                    setDetallesPlanificacion={setEjecuciones}
+                />
+
+                <div className="flex flex-wrap gap-3 justify-content-center justify-content-between">
+                    <Button style={{ backgroundColor: "#2596be", borderColor: "#2596be" }} label="Nuevo Registro" onClick={() => navigate(rutaServidor + "/registroIndividualProductividad/ModalCrearEjecucionPlanificacion")} />
+                    <Button style={{ backgroundColor: "#2596be", borderColor: "#2596be" }} label="Guardar" onClick={() => guardarEjecucion()} />
+                    <Button style={{ backgroundColor: "#2596be", borderColor: "#2596be" }} label="Cancelar" onClick={() => cancelarEjecucion()} />
+                </div>
+
+            </Form>
+        );
     };
 
     const rightToolbarTemplate = () => {
@@ -309,91 +411,101 @@ export const PantallaRegistroIndividualProductividad = () => {
         );
     };
 
-    const guardarProductividades = () => {
+    //### PANTALLA | LISTADO | HEADER
 
-        changedCells.forEach(item => {
+    const renderHeader = () => {
+        return (
+            <div className="d-flex justify-content-between">
+                <Button type="button" icon="pi pi-filter-slash" severity='secondary' label="Quitar Filtros" style={{ marginRight: "5px" }} outlined onClick={clearFilter} />
+                <span className="p-input-icon-left">
+                    <i className="pi pi-search" />
+                    <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Buscar..." />
+                </span>
+            </div>
+        );
+    };
 
-            console.log(item)
-            postProductividad(item);
-        });
-    }
+    const header = renderHeader();
 
-    const cancelarProductividades = () => {
-
-        setChangedCells([]);
-
-    }
-
-
-
-    const postProductividad = async (productividad) => {
-
-        try {
-            const response = await API.post("EjecucionPlanificaciones", productividad);
-
-            if (response.status == 200 || response.status == 204) {
-
-                console.log('datos guardados')
-            }
-        } catch (e) {
-            console.log(e)
-
-            accionFallida({ titulo: 'Ha ocurrido un error', mensaje: procesarErrores(e.response.data) })
-
-        }
-
-
-
-    }
-
-
+    //### PANTALLA | LISTADO | BODY
 
     return (
-        <>
-            <ModalCrearEjecucionPlanificacion
-                show={show}
-                setShow={setShow}
-                detallePlanificacion={planificacionEjecucion}
-                getDetallesPlanificacion={getProductividades}
-                setDetallePlanificacion={setPlanificacionEjecucion}
-                setDetallesPlanificacion={setProductividades}
-            />
-            <div className="mt-5">
-                <CustomCard title="Registro Individual de Productividad" >
-                    <div className="p-3">
-                        <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
-                        <DataTable paginator rows={5} rowsPerPageOptions={[5, 10, 25]} paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products" value={productividades} editMode="cell" className="editable-cells-table">
-                            <Column field="fecha" header="Fecha" body={(rowData) => rowData.fecha.substring(0, 10)} filter filterPlaceholder="Buscar por Fecha" style={{ minWidth: '12rem' }} />
-                            <Column field="horaInicioPlanificacion" header="Hora Inicio"
-                                body={(rowData) =>
+
+        <div className="mt-5">
+            <CustomCard title="Registro Individual de Productividad" >
+                <div className="p-3">
+                    <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
+                    <DataTable
+                        paginator rows={5}
+                        rowsPerPageOptions={[5, 10, 25]}
+                        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} rows"
+                        value={ejecuciones}
+                        editMode="cell"
+                        className="editable-cells-table">
+
+                        <Column
+                            field="fecha"
+                            header="Fecha"
+                            body={(rowData) => rowData.fecha.substring(0, 10)}
+                            filter
+                            filterPlaceholder="Buscar por fecha"
+                            style={{ minWidth: '12rem' }}
+                        />
+
+                        <Column
+                            field="horaInicioPlanificacion"
+                            header="Hora Inicio"
+                            body=
+                            {
+                                (rowData) =>
                                     <div style={isCellChanged(rowData.idDetallePlanificacion + 'horaInicioPlanificacion') ? { border: '1px solid red' } : {}}>
                                         {rowData.horaInicioPlanificacion}
                                     </div>
-                                }
-                                editor={(props) => renderStartTimeEditor(props, 'horaInicioPlanificacion')} filter filterPlaceholder="Buscar por Hora Inicio" style={{ minWidth: '12rem' }} />
+                            }
+                            editor=
+                            {
+                                (props) => renderStartTimeEditor(props)
+                            }
+                            filter
+                            filterPlaceholder="Buscar por hora inicio"
+                            style={{ minWidth: '12rem' }}
+                        />
 
-                            <Column field="horaFinPlanificacion" header="Hora Fin"
-                                body={(rowData) =>
+                        <Column
+                            field="horaFinPlanificacion"
+                            header="Hora Fin"
+                            body=
+                            {
+                                (rowData) =>
                                     <div style={isCellChanged(rowData.idDetallePlanificacion + 'horaFinPlanificacion') ? { border: '1px solid red' } : {}}>
                                         {rowData.horaFinPlanificacion}
                                     </div>
-                                }
-                                editor={(props) => renderEndTimeEditor(props, 'horaFinPlanificacion')} filter filterPlaceholder="Buscar por Hora Fin" style={{ minWidth: '12rem' }} />
+                            }
+                            editor=
+                            {
+                                (props) => renderEndTimeEditor(props)
+                            }
+                            filter
+                            filterPlaceholder="Buscar por hora fin"
+                            style={{ minWidth: '12rem' }} />
 
-                            <Column field="nombreTienda" header="Tienda"
-                                body={(rowData) =>
+                        <Column
+                            field="nombreTienda"
+                            header="Tienda"
+                            body=
+                            {
+                                (rowData) =>
                                     <div style={isCellChanged(rowData.idDetallePlanificacion + 'nombreTienda') ? { border: '1px solid red' } : {}}>
                                         {rowData.nombreTienda}
                                     </div>
-                                }
-                                editor={(props) => renderStoreEditor(props, 'nombreTienda')} filter filterPlaceholder="Buscar por Tienda" style={{ minWidth: '12rem' }} />
-                        </DataTable>
-                    </div>
-                </CustomCard>
-            </div>
-        </>
-
+                            }
+                        />
+                    </DataTable>
+                </div>
+            </CustomCard>
+        </div>
 
     );
+
 }

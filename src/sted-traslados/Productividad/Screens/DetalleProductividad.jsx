@@ -33,9 +33,8 @@ export const PantallaDetalleProductividad = () => {
 
     const [error, setError] = useState(null);
 
-    const [productividades, setProductividades] = useState([]);
     const [productividad, setProductividad] = useState([]);
-    const [idOperador, setIdOperador] = useState(0);
+    const [detalles, setDetalles] = useState([]);
 
 
     //####################################################################################################################################################
@@ -48,8 +47,7 @@ export const PantallaDetalleProductividad = () => {
 
             formik.setValues(location.state.productividad);
             setProductividad(location.state.productividad);
-
-            getProductividades(location.state?.productividad.idPlanificacion)
+            getProductividades(location.state.productividad)
         }
         else
             accionFallida({ titulo: 'E R R O R', mensaje: 'FALTA INFORMACIÓN' });
@@ -66,6 +64,7 @@ export const PantallaDetalleProductividad = () => {
     }
 
     const formik = useFormik({
+
         initialValues: getInitialValues(),
         Form,
         onSubmit: values => {
@@ -77,11 +76,11 @@ export const PantallaDetalleProductividad = () => {
     //### API
 
 
-    const getProductividades = async (idPlanificacion) => {
+    const getProductividades = async (pProductividad) => {
 
         try {
 
-            const response = await API.get(`ProductividadHeader/${idPlanificacion},${Number(idOperador)}`);
+            const response = await API.get(`ProductividadHeader/${pProductividad.idPlanificacion},${isNaN(pProductividad.idOperador) ? 0 : Number(pProductividad.idOperador)}`);
 
             if (response.status == 200 || response.status == 204) {
 
@@ -113,7 +112,7 @@ export const PantallaDetalleProductividad = () => {
 
                 });
 
-                setProductividades(dataWithDayOptions);
+                setDetalles(dataWithDayOptions);
             }
 
         }
@@ -201,7 +200,7 @@ export const PantallaDetalleProductividad = () => {
         import('jspdf').then((jsPDF) => {
             import('jspdf-autotable').then(() => {
                 const doc = new jsPDF.default(0, 0);
-                doc.autoTable(exportColumns, productividades);
+                doc.autoTable(exportColumns, detalles);
                 doc.save('Productividades.pdf');
             });
         });
@@ -211,7 +210,7 @@ export const PantallaDetalleProductividad = () => {
 
     const exportExcel = () => {
         import('xlsx').then((xlsx) => {
-            const worksheet = xlsx.utils.json_to_sheet(productividades);
+            const worksheet = xlsx.utils.json_to_sheet(detalles);
             const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
             const excelBuffer = xlsx.write(workbook, {
                 bookType: 'xlsx',
@@ -277,7 +276,7 @@ export const PantallaDetalleProductividad = () => {
     const header = renderHeader();
 
     //### PANTALLA | LISTADO | BODY
-    
+
     return (
         <div className="mt-5">
             <CustomCard title="Detalle de Productividad">
@@ -290,7 +289,7 @@ export const PantallaDetalleProductividad = () => {
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} rows"
                         ref={dt}
                         style={customStyle}
-                        value={productividades}
+                        value={detalles}
                         dataKey="idEmpleado"
                         filters={filters}
                         filterDisplay="row"
@@ -303,11 +302,11 @@ export const PantallaDetalleProductividad = () => {
                             body={
 
                                 (rowData) => {
-                                const idWithPadding = String(rowData.idPlanificacion).padStart(6, '0');
-                                return <a onClick={() => navigate(`${rutaServidor}/productividad/registroIndividualProductividad`, { state: { productividad: rowData } })} style={{ color: '#007bff', cursor: 'pointer' }}>{idWithPadding}</a>
-                            }}
+                                    const idWithPadding = String(rowData.idOperador).padStart(6, '0');
+                                    return <a onClick={() => navigate(`${rutaServidor}/productividad/registroIndividualProductividad`, { state: { detalle: rowData } })} style={{ color: '#007bff', cursor: 'pointer' }}>{idWithPadding}</a>
+                                }}
                             filter
-                            filterPlaceholder="Buscar por Id de Secuencia"
+                            filterPlaceholder="Buscar por id de Secuencia"
                             style={{ minWidth: '12rem' }}
                         />
                         <Column field="nombreOperador" header="Operador" filter filterPlaceholder="Buscar por el nombre del operador" style={{ minWidth: '12rem' }} />
@@ -328,24 +327,24 @@ export const PantallaDetalleProductividad = () => {
                                                 textColor = 'white';
                                             } else if (action === 'A') {
                                                 color = 'yellow';
-                                                textColor = 'black';  // Texto negro para fondo amarillo para mejor legibilidad
+                                                textColor = 'black';                        // Texto negro para fondo amarillo para mejor legibilidad
                                             } else {
                                                 color = 'white';
-                                                textColor = 'black';  // Texto negro para fondo blanco
+                                                textColor = 'black';                        // Texto negro para fondo blanco
                                             }
                                             return (
                                                 <div
                                                     key={index}
                                                     style={{
                                                         backgroundColor: color,
-                                                        color: textColor,  // Color de texto basado en el color de fondo
+                                                        color: textColor,                   // Color de texto basado en el color de fondo
                                                         padding: '10px',
                                                         fontWeight: 'bold',
                                                         // margin: '5px',
                                                         // borderRadius: '5px',
                                                         textAlign: 'center',
-                                                        width: '80px', // Puedes ajustar el tamaño según tus necesidades
-                                                        border: '1px solid brown' // Añadido borde
+                                                        width: '80px',                      // Puedes ajustar el tamaño según tus necesidades
+                                                        border: '1px solid brown'           // Añadido borde
                                                     }}
                                                 >
                                                     {option.label}
