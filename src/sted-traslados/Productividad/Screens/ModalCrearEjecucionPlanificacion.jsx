@@ -8,7 +8,7 @@ import { Form, Modal, Button } from "react-bootstrap";
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
-import { getOperadores, getTiendas, postOrPutDetallePlanificacion } from "./ejecucionPlanificacionUtils";
+import { postOrPutDetallePlanificacion } from "./ejecucionPlanificacionUtils";
 import { useGetEmpleadoCoordinadores } from "../../../hooks/useGetEmpleadoCoordinador";
 import { useGetTiendaCoordinadores } from "../../../hooks/useGetTiendaCoordinador";
 
