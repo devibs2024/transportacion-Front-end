@@ -12,7 +12,7 @@ import { getOperadores, getTiendas, postOrPutDetallePlanificacion } from "./ejec
 import { useGetEmpleadoCoordinadores } from "../../../hooks/useGetEmpleadoCoordinador";
 import { useGetTiendaCoordinadores } from "../../../hooks/useGetTiendaCoordinador";
 
-export const ModalCrearEjecucionPlanificacion = ({ show, setShow, ejecucion, getEjecuion}) => {
+export const ModalCrearEjecucionPlanificacion = ({ show, setShow, ejecucion, getEjecuion }) => {
 
     //####################################################################################################################################################
     //### VARIABLES GLOBALES
@@ -147,10 +147,10 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, ejecucion, get
         <Modal show={show} onHide={handleClose}>
             <Form onSubmit={formik.handleSubmit}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Agregar Detalle Planificación</Modal.Title>
+                    <Modal.Title>Agregar Registro Individual de Planificación</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-              
+
                     <div className="row">
                         <div className='col col-sm-6'>
                             <Form.Group controlId="habilitarFechaFin">
@@ -162,9 +162,9 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, ejecucion, get
                                 />
                             </Form.Group>
                         </div>
-                    </div> 
+                    </div>
                     <div className="row">
-                           <div className='col col-sm-6'>
+                        <div className='col col-sm-6'>
                             <Form.Group controlId="idOperador">
                                 <Form.Label>Operador:</Form.Label>
                                 <Form.Control as="select"
@@ -202,7 +202,8 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, ejecucion, get
                                 </Form.Text>
                             </Form.Group>
                         </div>
-                     {/*   </div>
+                    </div>
+
                     <div className="row">
 
                         <div className='col col-sm-6'>
@@ -224,11 +225,8 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, ejecucion, get
                             </Form.Group>
                         </div>
 
-
                         <div className='col col-sm-6'>
-                            <Form.Group controlId="fechaHasta"
-
-                            >
+                            <Form.Group controlId="fechaHasta">
                                 <Form.Label>Fecha Hasta:</Form.Label>
                                 <DatePicker
                                     style={!showFechaFin ? { backgroundColor: "#D3D3D3" } : {}}
@@ -270,7 +268,6 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, ejecucion, get
                             </Form.Group>
                         </div>
 
-
                         <div className='col col-sm-6'>
                             <Form.Group controlId="horaF">
                                 <Form.Label>Hora Salida:</Form.Label>
@@ -308,9 +305,10 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, ejecucion, get
                                     ) : null}
                                 </Form.Text>
                             </Form.Group>
-                        </div>     */}
+                        </div>
+
                     </div>
-               
+
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleClose}>
