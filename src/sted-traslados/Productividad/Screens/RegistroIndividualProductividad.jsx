@@ -35,10 +35,8 @@ export const PantallaRegistroIndividualProductividad = () => {
     const [show, setShow] = useState(false);
     const [error, setError] = useState(null);
 
-    const [detalle, setDetalle] = useState([]);
+    const [ejecucion, setEjecucion] = useState([]);
     const [ejecuciones, setEjecuciones] = useState([]);
-
-    const [selectedStore, setSelectedStore] = useState(null);
     const [changedCells, setChangedCells] = useState([]);
 
     const [planificacionEjecucion, setPlanificacionEjecucion] = useState({});
@@ -56,7 +54,7 @@ export const PantallaRegistroIndividualProductividad = () => {
         if (location.state?.detalle) {
 
             formik.setValues(location.state.detalle);
-            setDetalle(location.state.detalle);
+            setEjecucion(location.state.detalle);
 
             getEjecuciones(location.state?.detalle)
 
@@ -96,6 +94,10 @@ export const PantallaRegistroIndividualProductividad = () => {
 
     }
 
+    const openEjecucion = (row) => {
+
+        setShow(true);
+    }
 
     //####################################################################################################################################################
     //### FUNCIONES
@@ -385,14 +387,12 @@ export const PantallaRegistroIndividualProductividad = () => {
                 <ModalCrearEjecucionPlanificacion
                     show={show}
                     setShow={setShow}
-                    detallePlanificacion={planificacionEjecucion}
-                    getDetallesPlanificacion={getEjecuciones}
-                    setDetallePlanificacion={setPlanificacionEjecucion}
-                    setDetallesPlanificacion={setEjecuciones}
+                    ejecucion={ejecucion}
+                    setEjecucion={setEjecucion}
                 />
 
                 <div className="flex flex-wrap gap-3 justify-content-center justify-content-between">
-                    <Button style={{ backgroundColor: "#2596be", borderColor: "#2596be" }} label="Nuevo Registro" onClick={() => navigate(rutaServidor + "/registroIndividualProductividad/ModalCrearEjecucionPlanificacion")} />
+                    <Button style={{ backgroundColor: "#2596be", borderColor: "#2596be" }} label="Nuevo Registro" onClick={openEjecucion} />
                     <Button style={{ backgroundColor: "#2596be", borderColor: "#2596be" }} label="Guardar" onClick={() => guardarEjecucion()} />
                     <Button style={{ backgroundColor: "#2596be", borderColor: "#2596be" }} label="Cancelar" onClick={() => cancelarEjecucion()} />
                 </div>

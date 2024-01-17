@@ -1,23 +1,28 @@
-import { Button, Modal, Form } from "react-bootstrap";
-import { useFormik } from 'formik';
-import { useEffect, useState } from "react";
 import API from "../../../store/api";
+
+import { useEffect, useState } from "react";
+
+import { useFormik } from 'formik';
+import { Form, Modal, Button } from "react-bootstrap";
+
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { getOperadores, getTiendas, postOrPutDetallePlanificacion, getDetallesPlanificacion } from "./ejecucionPlanificacionUtils";
 
-export const ModalCrearEjecucionPlanificacion = ({ detallePlanificacion,  show, setShow, setDetallesPlanificacion, getDetallesPlanificacion }) => {
- 
+import { getOperadores, getTiendas, postOrPutDetallePlanificacion } from "./ejecucionPlanificacionUtils";
+import { useGetEmpleadoCoordinadores } from "../../../hooks/useGetEmpleadoCoordinador";
+import { useGetTiendaCoordinadores } from "../../../hooks/useGetTiendaCoordinador";
+
+export const ModalCrearEjecucionPlanificacion = ({ show, setShow, ejecucion, getEjecuion}) => {
+
+    //####################################################################################################################################################
+    //### VARIABLES GLOBALES
+
     const [showFechaFin, setShowFechaFin] = useState(false);
 
     const handleSwitchChange = (e) => {
 
         setShowFechaFin(e.target.checked);
     };
-
-    const [operadores, setOperadores] = useState([]);
-    
-    const [tiendas, setTiendas] = useState([]);
 
     const [idCoordinador, setIdCoordinador] = useState(0);
 
@@ -32,6 +37,9 @@ export const ModalCrearEjecucionPlanificacion = ({ detallePlanificacion,  show, 
             readOnly
         />
     );
+
+
+    const handleShow = () => setShow(true);
 
     const parseDateString = (dateString) => {
         const date = new Date(dateString);
@@ -55,34 +63,36 @@ export const ModalCrearEjecucionPlanificacion = ({ detallePlanificacion,  show, 
         return `${year}-${month}-${day}`;
     };
 
+    //####################################################################################################################################################
+    //### EVENTOS
+
     useEffect(() => {
-        getOperadores(setOperadores);
-        getTiendas(setTiendas, setIdCoordinador)
+
     }, [])
 
-    useEffect(() => {
+    //useEffect(() => {
 
 
-        if (Object.keys(detallePlanificacion).length !== 0) {
-            formik.setValues({
-                idOperador: detallePlanificacion.idOperador,
-                idTienda: detallePlanificacion.idTienda,
-                fecha: parseDateString(detallePlanificacion.fecha),
-                horaE: timeStringToDate(detallePlanificacion.horaInicio.substring(0, 5)),
-                horaF: timeStringToDate(detallePlanificacion.horaFin.substring(0, 5)),
-                descanso: detallePlanificacion.descanso
-            })
-        } else {
-            formik.setValues({
-                idOperador: 0,
-                idTienda: 0,
-                fecha: '',
-                horaE: '',
-                horaF: '',
-                descanso: false
-            });
-        }
-    }, [detallePlanificacion])
+    //    if (Object.keys(detallePlanificacion).length !== 0) {
+    //        formik.setValues({
+    //            idOperador: detallePlanificacion.idOperador,
+    //            idTienda: detallePlanificacion.idTienda,
+    //            fecha: parseDateString(detallePlanificacion.fecha),
+    //            horaE: timeStringToDate(detallePlanificacion.horaInicio.substring(0, 5)),
+    //            horaF: timeStringToDate(detallePlanificacion.horaFin.substring(0, 5)),
+    //            descanso: detallePlanificacion.descanso
+    //        })
+    //    } else {
+    //        formik.setValues({
+    //            idOperador: 0,
+    //            idTienda: 0,
+    //            fecha: '',
+    //            horaE: '',
+    //            horaF: '',
+    //            descanso: false
+    //        });
+    //    }
+    //}, [detallePlanificacion])
 
 
     function timeStringToDate(timeString) {
@@ -93,15 +103,6 @@ export const ModalCrearEjecucionPlanificacion = ({ detallePlanificacion,  show, 
 
         return date;
     }
-    const operadoresOptions = operadores.map(s => ({
-        value: s.idEmpleado,
-        label: s.nombres
-    }));
-
-    const tiendasOptions = tiendas.map(t => ({
-        value: t.idTienda,
-        label: t.nombreTienda
-    }));
 
     const formik = useFormik({
         initialValues: {
@@ -119,10 +120,10 @@ export const ModalCrearEjecucionPlanificacion = ({ detallePlanificacion,  show, 
             console.log(values);
 
             const detallesPlanificacion = {
-                idDetallePlanificacion: detallePlanificacion?.idDetallePlanificacion,
+                //idDetallePlanificacion: detallePlanificacion?.idDetallePlanificacion,
                 idTienda: values.idTienda,
                 idOperador: values.idOperador,
-                idPlanificacion: detallePlanificacion.idPlanificacion,
+                //idPlanificacion: detallePlanificacion.idPlanificacion,
                 fecha: formatDateToYYYYMMDD(values.fecha),
                 horaE: formatDateToHours(values.horaE),
                 minutoE: formatDateToMinutes(values.horaE),
@@ -130,10 +131,17 @@ export const ModalCrearEjecucionPlanificacion = ({ detallePlanificacion,  show, 
                 minutoF: formatDateToMinutes(values.horaF),
                 fechaHasta: showFechaFin ? formatDateToYYYYMMDD(values.fechaHasta) : formatDateToYYYYMMDD(values.fecha),
                 descanso: values.descanso
-            }  
-            postOrPutDetallePlanificacion(detallesPlanificacion,getDetallesPlanificacion, detallePlanificacion, setDetallesPlanificacion);         
+            }
+            //postOrPutDetallePlanificacion(detallesPlanificacion, getDetallesPlanificacion, detallePlanificacion, setDetallesPlanificacion);
         }
     });
+
+
+    //####################################################################################################################################################
+    //### COMBOS
+
+    const operadoresOptions = useGetEmpleadoCoordinadores(idCoordinador).map((list) => ({ value: list.idOperador, label: list.nombres }));
+    const tiendasOptions = useGetTiendaCoordinadores(idCoordinador).map((list) => ({ value: list.idTienda, label: list.nombreTienda }));
 
     return (
         <Modal show={show} onHide={handleClose}>
@@ -142,6 +150,7 @@ export const ModalCrearEjecucionPlanificacion = ({ detallePlanificacion,  show, 
                     <Modal.Title>Agregar Detalle Planificación</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+              
                     <div className="row">
                         <div className='col col-sm-6'>
                             <Form.Group controlId="habilitarFechaFin">
@@ -153,9 +162,9 @@ export const ModalCrearEjecucionPlanificacion = ({ detallePlanificacion,  show, 
                                 />
                             </Form.Group>
                         </div>
-                    </div>
+                    </div> 
                     <div className="row">
-                        <div className='col col-sm-6'>
+                           <div className='col col-sm-6'>
                             <Form.Group controlId="idOperador">
                                 <Form.Label>Operador:</Form.Label>
                                 <Form.Control as="select"
@@ -193,7 +202,7 @@ export const ModalCrearEjecucionPlanificacion = ({ detallePlanificacion,  show, 
                                 </Form.Text>
                             </Form.Group>
                         </div>
-                    </div>
+                     {/*   </div>
                     <div className="row">
 
                         <div className='col col-sm-6'>
@@ -215,31 +224,31 @@ export const ModalCrearEjecucionPlanificacion = ({ detallePlanificacion,  show, 
                             </Form.Group>
                         </div>
 
-                          
-                            <div className='col col-sm-6'>
-                                <Form.Group controlId="fechaHasta"
-                              
-                                >
-                                    <Form.Label>Fecha Hasta:</Form.Label>
-                                    <DatePicker
-                                   style={!showFechaFin ? { backgroundColor: "#D3D3D3" } : {}}
-                                        id="fechaHasta"
-                                        name="fechaHasta"
-                                        
-                                        disabled = {!showFechaFin}
-                                        selected={formik.values.fechaHasta ? new Date(formik.values.fechaHasta) : null}
-                                        onChange={(date) => formik.setFieldValue('fechaHasta', date)}
-                                        onBlur={formik.handleBlur}
-                                        showMonthDropdown
-                                        showYearDropdown
-                                        customInput={<CustomInput />}
-                                    />
-                                    {formik.touched.fechaHasta && formik.errors.fechaHasta ? (
-                                        <Form.Text className="text-danger">{formik.errors.fechaHasta}</Form.Text>
-                                    ) : null}
-                                </Form.Group>
-                            </div>
-                        
+
+                        <div className='col col-sm-6'>
+                            <Form.Group controlId="fechaHasta"
+
+                            >
+                                <Form.Label>Fecha Hasta:</Form.Label>
+                                <DatePicker
+                                    style={!showFechaFin ? { backgroundColor: "#D3D3D3" } : {}}
+                                    id="fechaHasta"
+                                    name="fechaHasta"
+
+                                    disabled={!showFechaFin}
+                                    selected={formik.values.fechaHasta ? new Date(formik.values.fechaHasta) : null}
+                                    onChange={(date) => formik.setFieldValue('fechaHasta', date)}
+                                    onBlur={formik.handleBlur}
+                                    showMonthDropdown
+                                    showYearDropdown
+                                    customInput={<CustomInput />}
+                                />
+                                {formik.touched.fechaHasta && formik.errors.fechaHasta ? (
+                                    <Form.Text className="text-danger">{formik.errors.fechaHasta}</Form.Text>
+                                ) : null}
+                            </Form.Group>
+                        </div>
+
                         <div className='col col-sm-6'>
                             <Form.Group controlId="horaE">
                                 <Form.Label>Hora Entrada:</Form.Label>
@@ -299,8 +308,9 @@ export const ModalCrearEjecucionPlanificacion = ({ detallePlanificacion,  show, 
                                     ) : null}
                                 </Form.Text>
                             </Form.Group>
-                        </div>
+                        </div>     */}
                     </div>
+               
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleClose}>

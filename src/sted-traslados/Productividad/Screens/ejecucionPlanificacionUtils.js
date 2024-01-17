@@ -5,16 +5,6 @@ import * as decodeToken from '../../../shared/Utils/decodeToken';
 
 import { procesarErrores } from "../../../shared/Utils/procesarErrores";
 
-export const getDetallesPlanificacion = async (planificacion, setDetallesPlanificacion) => {
-
-    const response = await API.get(`DetallePlanificaciones`);
-
-    if (response.status == 200 || response.status == 204) {
-        setDetallesPlanificacion(response.data);
-    }
-
-};
-
 export const postOrPutDetallePlanificacion = async (detallePlanificacion, getDetallesPlanificacion, planificacion, setDetallesPlanificacion) => {
 
     try {
@@ -108,35 +98,4 @@ export const eliminarDetallePlanificacion = (idDetallePlanificacion, detallesPla
 
 };
 
-export const getOperadores = async (setOperadores) => {
 
-    const response = await API.get(`Operador`);
-
-    if (response.status == 200 || response.status == 204) {
-        const filteredOperadores = response.data.filter(
-            (o) => o.idTipoEmpleado == 1
-        );
-        setOperadores(filteredOperadores);
-    }
-
-};
-
-export const getTiendas = async (setTiendas) => {
-
-    const idCoordinador = decodeToken.tokenDecode()
-
-    console.log(idCoordinador)
-    try {
-
-        const response = await API.get(`TiendasCoordinador/${idCoordinador},3`);
-
-        if (response.status == 200 || response.status == 204) {
-            setTiendas(response.data);
-        }
-
-    }
-    catch (e) {
-
-    }
-
-};
