@@ -136,7 +136,7 @@ export const PantallaDetalleNomina = () => {
             };
 
             setNomina(nomina)
-            postPago(nomina)
+            putPago(nomina)
 
         }
         else {
@@ -490,7 +490,7 @@ export const PantallaDetalleNomina = () => {
                         <Button
                             type="button"
                             style={{ backgroundColor: "#2596BE", borderColor: "#2596BE", width: "120px", height: "43px", marginLeft: "0px" }}
-                            onClick={() => postProcesoNomina()}
+                            onClick={() => putProcesoNomina()}
                             label="Pago"
                             icon="pi pi-plus right"
                             iconPos="right"
