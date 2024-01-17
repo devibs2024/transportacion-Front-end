@@ -120,7 +120,7 @@ export const PantallaDetalleNomina = () => {
         getConsultaNomina(nomina);
     }
 
-    const postProcesoNomina = () => {
+    const putProcesoNomina = () => {
 
         if (comprobantes.length > 0) {
 
@@ -209,7 +209,7 @@ export const PantallaDetalleNomina = () => {
         }
     }
 
-    const postPago = async (pNomina) => {
+    const putPago = async (pNomina) => {
 
         try {
 
