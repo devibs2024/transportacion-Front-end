@@ -14,19 +14,28 @@ const procesarErrorIndividual = (errorObj, maxMensajes) => {
 
 export const procesarErrores = (errores, maxErrores = 3, maxMensajesPorError = 2) => {
 
+
     let mensajeFinal = "";
 
-    if (!Array.isArray(errores)) {
-        errores = [errores];
+    try {
+
+
+        if (!Array.isArray(errores)) {
+            errores = [errores];
+        }
+
+        const primerosErrores = obtenerPrimerosNElementos(errores, maxErrores);
+
+        primerosErrores.forEach((errorObj) => {
+
+            mensajeFinal += procesarErrorIndividual(errorObj, maxMensajesPorError);
+
+        });
+
     }
-
-    const primerosErrores = obtenerPrimerosNElementos(errores, maxErrores);
-
-    primerosErrores.forEach((errorObj) => {
-
-        mensajeFinal += procesarErrorIndividual(errorObj, maxMensajesPorError);
-
-    });
+    catch (err) {
+        mensajeFinal = "No se puede mostrar el error"
+    }
 
     return mensajeFinal;
 };
