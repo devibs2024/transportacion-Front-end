@@ -37,6 +37,7 @@ export const PlanificacionDetalleTable = ({
         if (response.status == 200 || response.status == 204) {
             setDetallesGeneralesPlanificacion(response.data);
             setExpandedRows(response.data)
+            console.log(response.data)
         }
     };
 
