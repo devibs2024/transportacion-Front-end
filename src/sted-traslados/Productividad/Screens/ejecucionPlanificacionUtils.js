@@ -53,13 +53,7 @@ export const postOrPutDetallePlanificacion = async (detallePlanificacion, getDet
 
         let errores = e.response.data;
 
-        console.log(errores);
-        accionFallida({
-            titulo: "El detalle de Planificacion no pudo ser agregado",
-            mensaje: procesarErrores(errores),
-        }).then(() => {
-            //    handleClose();
-        });
+        accionFallida({ titulo: "El detalle de Planificacion no pudo ser agregado", mensaje: procesarErrores(errores), })
     }
 };
 

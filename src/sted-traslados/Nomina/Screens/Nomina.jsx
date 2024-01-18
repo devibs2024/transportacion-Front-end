@@ -245,8 +245,8 @@ export const PantallaNomina = () => {
                             style={{ minWidth: '12rem' }}
                         />
                         <Column field="coordinador" header="Coordinador" filter filterPlaceholder="Buscar por el nombre del coordinador" style={{ minWidth: '12rem' }} />
-                        <Column field="fechaDesde" header="Inicio" body={(rowData) => rowData.fechaDesde.substring(0, 10)} filter filterPlaceholder="Buscar por el fecha inicio" style={{ minWidth: '12rem' }} />
-                        <Column field="fechaHasta" header="Final" body={(rowData) => rowData.fechaHasta.substring(0, 10)} filter filterPlaceholder="Buscar por fecha fin" style={{ minWidth: '12rem' }} />
+                        <Column field="fechaDesde" header="Fecha Desde" body={(rowData) => rowData.fechaDesde.substring(0, 10)} filter filterPlaceholder="Buscar por el fecha inicio" style={{ minWidth: '12rem' }} />
+                        <Column field="fechaHasta" header="Fecha Hasta" body={(rowData) => rowData.fechaHasta.substring(0, 10)} filter filterPlaceholder="Buscar por fecha fin" style={{ minWidth: '12rem' }} />
                         <Column field="frecuencia" header="Frecuencia" filter filterPlaceholder="Buscar por frecuencia" style={{ minWidth: '12rem' }} />
                         <Column field="estatus" header="Estado" filter filterPlaceholder="Buscar por el nombre del estado" style={{ minWidth: '12rem' }} />
                     </DataTable>

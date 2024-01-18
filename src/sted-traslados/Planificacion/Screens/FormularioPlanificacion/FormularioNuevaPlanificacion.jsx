@@ -196,7 +196,7 @@ export const FormularioNuevaPlanificacion = ({ setPlanificacion, planificacion }
                     </div>
                     <div className='col col-sm-6'>
                         <Form.Group controlId="fechaHasta">
-                            <Form.Label>Fecha Fin:</Form.Label>
+                            <Form.Label>Fecha Hasta:</Form.Label>
                             <DatePicker
                                 id="fechaHasta"
                                 name="fechaHasta"

@@ -3,7 +3,6 @@ import API from "../../../store/api";
 import React, { useState, useEffect, useRef } from 'react';
 
 import { useLocation, useNavigate } from 'react-router-dom';
-import { rutaServidor } from '../../../routes/rutaServidor';
 
 import { useFormik } from "formik";
 import { Form, Modal } from 'react-bootstrap';
@@ -17,10 +16,8 @@ import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Calendar } from 'primereact/calendar';
-import { Dropdown } from 'primereact/dropdown';
 
-import { accionExitosa, accionFallida, confirmarAccion } from '../../../shared/Utils/modals';
-import { procesarErrores } from '../../../shared/Utils/procesarErrores';
+import { accionExitosa, accionFallida } from '../../../shared/Utils/modals';
 
 export const PantallaRegistroIndividualProductividad = () => {
 
@@ -35,11 +32,9 @@ export const PantallaRegistroIndividualProductividad = () => {
     const [show, setShow] = useState(false);
     const [error, setError] = useState(null);
 
-    const [ejecucion, setEjecucion] = useState([]);
+    const [detalle, setDetalle] = useState([]);
     const [ejecuciones, setEjecuciones] = useState([]);
     const [changedCells, setChangedCells] = useState([]);
-
-    const [planificacionEjecucion, setPlanificacionEjecucion] = useState({});
 
     const handleShow = () => setShow(true);
     const handleClose = () => setShow(false);
@@ -54,7 +49,7 @@ export const PantallaRegistroIndividualProductividad = () => {
         if (location.state?.detalle) {
 
             formik.setValues(location.state.detalle);
-            setEjecucion(location.state.detalle);
+            setDetalle(location.state.detalle);
 
             getEjecuciones(location.state?.detalle)
 
@@ -83,20 +78,39 @@ export const PantallaRegistroIndividualProductividad = () => {
 
     const guardarEjecucion = () => {
 
-        changedCells.forEach(item => {
-            postEjecucion(item);
-        });
+        try {
+
+            changedCells.forEach((item) => { putDetallePlanificacion(item); });
+
+            getEjecuciones(detalle)
+
+            accionExitosa({ titulo: "Registro Individual de Productividad", mensaje: "¡Actualización satisfactoria!" });
+
+        }
+        catch (er) {
+
+            if (er.response?.data) {
+                setError(er.response.data);
+                accionFallida({ titulo: 'E R R O R', mensaje: JSON.stringify(er.response.data) });
+            }
+            else {
+                accionFallida({ titulo: 'E R R O R', mensaje: er.message });
+            }
+
+        }
+
     }
 
     const cancelarEjecucion = () => {
 
-        setChangedCells([]);
+        getEjecuciones(detalle)
 
     }
 
-    const openEjecucion = (row) => {
+    const openEjecucion = () => {
 
         setShow(true);
+
     }
 
     //####################################################################################################################################################
@@ -126,6 +140,9 @@ export const PantallaRegistroIndividualProductividad = () => {
 
         try {
 
+            setChangedCells([])
+            setEjecuciones([])
+
             const response = await API.get(`Productividad/${pDetalle.idPlanificacion},${Number(pDetalle.idOperador)}`);
 
             if (response.status == 200 || response.status == 204) {
@@ -146,24 +163,51 @@ export const PantallaRegistroIndividualProductividad = () => {
         }
     }
 
-    const postEjecucion = async (ejecucion) => {
+    const putDetallePlanificacion = async (pEjecucion) => {
 
         try {
 
-            const response = await API.post("EjecucionPlanificaciones", ejecucion);
+            let HoraEntrada = new Date(obtenerFechaHoraFormateada(new Date(pEjecucion.fecha), pEjecucion.horaInicioEjecucion))
+            let HoraSalida = new Date(obtenerFechaHoraFormateada(new Date(pEjecucion.fecha), pEjecucion.horaFinEjecucion))
 
-            if (response.status == 200 || response.status == 204) {
-
-                console.log('datos guardados')
+            let pEjecucionPlanificacion =
+            {
+                idPlanificacion: pEjecucion.idPlanificacion,
+                idDetallePlanificacion: pEjecucion.idDetallePlanificacion,
+                idEjecucionPlanificacion: pEjecucion.idEjecucionPlanificacion,
+                idOperador: pEjecucion.idOperador,
+                idTienda: pEjecucion.idTienda,
+                fecha: pEjecucion.fecha,
+                horaE: HoraEntrada.getHours(),
+                minutoE: HoraEntrada.getMinutes(),
+                horaF: HoraSalida.getHours(),
+                minutoF: HoraSalida.getMinutes(),
+                descanso: pEjecucion.descanso,
+                incentivoFactura: pEjecucion.incentivoFactura,
+                descuentoTardanza: pEjecucion.descuentoTardanza,
+                montoHorasExtras: pEjecucion.montoHorasExtras,
+                justificacion: pEjecucion.justificacion,
             }
 
-        } catch (e) {
+            const response = await API.put(`EjecucionPlanificaciones/${pEjecucionPlanificacion.idEjecucionPlanificacion}`, pEjecucionPlanificacion);
 
-            accionFallida({ titulo: 'Ha ocurrido un error', mensaje: procesarErrores(e.response.data) })
+            if (response.status == 200 || response.status == 204) {
+            }
+
+        }
+        catch (er) {
+
+            if (er.response?.data) {
+                setError(er.response.data);
+                accionFallida({ titulo: 'E R R O R', mensaje: JSON.stringify(er.response.data) });
+            }
+            else {
+                accionFallida({ titulo: 'E R R O R', mensaje: er.message });
+            }
 
         }
 
-    }
+    };
 
     //####################################################################################################################################################
     //### COMBOS
@@ -188,16 +232,16 @@ export const PantallaRegistroIndividualProductividad = () => {
 
     const onStartTimeChange = (e, rowData) => {
 
-        rowData.horaInicioPlanificacion = obtenerFechaFormateada(e.value);
+        rowData.horaInicioEjecucion = obtenerFechaFormateada(e.value);
 
         let updatedProductividades = [...ejecuciones];
-        let index = updatedProductividades.findIndex(data => data.idDetallePlanificacion === rowData.idDetallePlanificacion);
-        updatedProductividades[index].horaInicioPlanificacion = rowData.horaInicioPlanificacion;
+        let index = updatedProductividades.findIndex(data => data.idEjecucionPlanificacion === rowData.idEjecucionPlanificacion);
+        updatedProductividades[index].horaInicioEjecucion = obtenerFechaFormateada(e.value);
         setEjecuciones(updatedProductividades);
 
         setChangedCells(prev => {
 
-            const index = prev.findIndex(el => el.idDetallePlanificacion === rowData.idDetallePlanificacion);
+            const index = prev.findIndex(el => el.idEjecucionPlanificacion === rowData.idEjecucionPlanificacion);
 
             if (index !== -1) {
                 return [
@@ -215,16 +259,16 @@ export const PantallaRegistroIndividualProductividad = () => {
 
     const onEndTimeChange = (e, rowData) => {
 
-        rowData.horaFinPlanificacion = obtenerFechaFormateada(e.value);
+        rowData.horaFinEjecucion = obtenerFechaFormateada(e.value);
 
         let updatedProductividades = [...ejecuciones];
-        let index = updatedProductividades.findIndex(data => data.idDetallePlanificacion === rowData.idDetallePlanificacion);
-        updatedProductividades[index].horaFinPlanificacion = rowData.horaFinPlanificacion;
+        let index = updatedProductividades.findIndex(data => data.idEjecucionPlanificacion === rowData.idEjecucionPlanificacion);
+        updatedProductividades[index].horaFinEjecucion = obtenerFechaFormateada(e.value);
         setEjecuciones(updatedProductividades);
 
         setChangedCells(prev => {
 
-            const index = prev.findIndex(el => el.idDetallePlanificacion === rowData.idDetallePlanificacion);
+            const index = prev.findIndex(el => el.idEjecucionPlanificacion === rowData.idEjecucionPlanificacion);
 
             if (index !== -1) {
                 return [
@@ -241,15 +285,17 @@ export const PantallaRegistroIndividualProductividad = () => {
     };
 
     const isCellChanged = (id) => {
+
         return changedCells.find(cell => cell.id === id)?.changed;
+
     };
 
     const renderStartTimeEditor = (props) => {
 
         return (
             <Calendar
-                id={props.rowData.idDetallePlanificacion}
-                value={new Date(obtenerFechaHoraFormateada(new Date(props.rowData.fecha), props.rowData.horaInicioPlanificacion))}
+                id={props.rowData.idEjecucionPlanificacion}
+                value={new Date(obtenerFechaHoraFormateada(new Date(props.rowData.fecha), props.rowData.horaInicioEjecucion))}
                 appendTo={document.body}
                 onChange={(e) => onStartTimeChange(e, props.rowData)}
                 timeOnly
@@ -265,8 +311,8 @@ export const PantallaRegistroIndividualProductividad = () => {
 
         return (
             <Calendar
-                id={props.rowData.idDetallePlanificacion}
-                value={new Date(obtenerFechaHoraFormateada(new Date(props.rowData.fecha), props.rowData.horaFinPlanificacion))}
+                id={props.rowData.idEjecucionPlanificacion}
+                value={new Date(obtenerFechaHoraFormateada(new Date(props.rowData.fecha), props.rowData.horaFinEjecucion))}
                 appendTo={document.body}
                 onChange={(e) => onEndTimeChange(e, props.rowData)}
                 timeOnly
@@ -387,14 +433,14 @@ export const PantallaRegistroIndividualProductividad = () => {
                 <ModalCrearEjecucionPlanificacion
                     show={show}
                     setShow={setShow}
-                    ejecucion={ejecucion}
-                    setEjecucion={setEjecucion}
+                    detalle={detalle}
+                    setDetalle={setDetalle}
                 />
 
                 <div className="flex flex-wrap gap-3 justify-content-center justify-content-between">
-                    <Button style={{ backgroundColor: "#2596be", borderColor: "#2596be" }} label="Nuevo Registro" onClick={openEjecucion} />
-                    <Button style={{ backgroundColor: "#2596be", borderColor: "#2596be" }} label="Guardar" onClick={() => guardarEjecucion()} />
-                    <Button style={{ backgroundColor: "#2596be", borderColor: "#2596be" }} label="Cancelar" onClick={() => cancelarEjecucion()} />
+                    <Button type="button" style={{ backgroundColor: "#2596be", borderColor: "#2596be" }} label="Nuevo Registro" onClick={openEjecucion} />
+                    <Button type="button" style={{ backgroundColor: "#2596be", borderColor: "#2596be" }} label="Guardar" onClick={() => guardarEjecucion()} />
+                    <Button type="button" style={{ backgroundColor: "#2596be", borderColor: "#2596be" }} label="Cancelar" onClick={() => cancelarEjecucion()} />
                 </div>
 
             </Form>
@@ -454,13 +500,13 @@ export const PantallaRegistroIndividualProductividad = () => {
                         />
 
                         <Column
-                            field="horaInicioPlanificacion"
+                            field="horaInicioEjecucion"
                             header="Hora Inicio"
                             body=
                             {
                                 (rowData) =>
-                                    <div style={isCellChanged(rowData.idDetallePlanificacion + 'horaInicioPlanificacion') ? { border: '1px solid red' } : {}}>
-                                        {rowData.horaInicioPlanificacion}
+                                    <div style={isCellChanged(rowData.idEjecucionPlanificacion + 'horaInicioEjecucion') ? { border: '1px solid red' } : {}}>
+                                        {rowData.horaInicioEjecucion}
                                     </div>
                             }
                             editor=
@@ -473,13 +519,13 @@ export const PantallaRegistroIndividualProductividad = () => {
                         />
 
                         <Column
-                            field="horaFinPlanificacion"
+                            field="horaFinEjecucion"
                             header="Hora Fin"
                             body=
                             {
                                 (rowData) =>
-                                    <div style={isCellChanged(rowData.idDetallePlanificacion + 'horaFinPlanificacion') ? { border: '1px solid red' } : {}}>
-                                        {rowData.horaFinPlanificacion}
+                                    <div style={isCellChanged(rowData.idEjecucionPlanificacion + 'horaFinEjecucion') ? { border: '1px solid red' } : {}}>
+                                        {rowData.horaFinEjecucion}
                                     </div>
                             }
                             editor=
@@ -496,7 +542,7 @@ export const PantallaRegistroIndividualProductividad = () => {
                             body=
                             {
                                 (rowData) =>
-                                    <div style={isCellChanged(rowData.idDetallePlanificacion + 'nombreTienda') ? { border: '1px solid red' } : {}}>
+                                    <div style={isCellChanged(rowData.idEjecucionPlanificacion + 'nombreTienda') ? { border: '1px solid red' } : {}}>
                                         {rowData.nombreTienda}
                                     </div>
                             }
