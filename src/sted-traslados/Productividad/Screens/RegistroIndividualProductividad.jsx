@@ -33,6 +33,7 @@ export const PantallaRegistroIndividualProductividad = () => {
     const [show, setShow] = useState(false);
     const [error, setError] = useState(null);
 
+    const [productividad, setProductividad] = useState([]);
     const [detalle, setDetalle] = useState([]);
     const [ejecuciones, setEjecuciones] = useState([]);
     const [changedCells, setChangedCells] = useState([]);
@@ -47,13 +48,19 @@ export const PantallaRegistroIndividualProductividad = () => {
 
     useEffect(() => {
 
+        if (location.state?.productividad) {
+
+            formik.setValues(location.state.productividad);
+            setProductividad(location.state.productividad);
+
+        }
+
         if (location.state?.detalle) {
 
             formik.setValues(location.state.detalle);
             setDetalle(location.state.detalle);
 
             getEjecuciones(location.state?.detalle)
-
         }
         else
             accionFallida({ titulo: 'E R R O R', mensaje: 'FALTA INFORMACIÓN' });
@@ -435,6 +442,7 @@ export const PantallaRegistroIndividualProductividad = () => {
                 <ModalCrearEjecucionPlanificacion
                     show={show}
                     setShow={setShow}
+                    productividad={productividad}
                     detalle={detalle}
                     setDetalle={setDetalle}
                 />

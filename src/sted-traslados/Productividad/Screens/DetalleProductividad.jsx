@@ -303,7 +303,7 @@ export const PantallaDetalleProductividad = () => {
 
                                 (rowData) => {
                                     const idWithPadding = String(rowData.idOperador).padStart(6, '0');
-                                    return <a onClick={() => navigate(`${rutaServidor}/productividad/registroIndividualProductividad`, { state: { detalle: rowData } })} style={{ color: '#007bff', cursor: 'pointer' }}>{idWithPadding}</a>
+                                    return <a onClick={() => navigate(`${rutaServidor}/productividad/registroIndividualProductividad`, { state: { productividad: productividad, detalle: rowData } })} style={{ color: '#007bff', cursor: 'pointer' }}>{idWithPadding}</a>
                                 }}
                             filter
                             filterPlaceholder="Buscar por id de Secuencia"

@@ -19,15 +19,13 @@ import { accionExitosa, accionFallida } from '../../../shared/Utils/modals';
 import { useGetEmpleadoCoordinadores } from "../../../hooks/useGetEmpleadoCoordinador";
 import { useGetTiendaCoordinadores } from "../../../hooks/useGetTiendaCoordinador";
 
-export const ModalCrearEjecucionPlanificacion = ({ show, setShow, detalle, setDetalle }) => {
+export const ModalCrearEjecucionPlanificacion = ({ show, setShow, productividad, detalle, setDetalle }) => {
 
     //####################################################################################################################################################
     //### VARIABLES GLOBALES
 
     const navigate = useNavigate();
     const location = useLocation();
-
-    const [showFechaFin, setShowFechaFin] = useState(false);
 
     const idCoordinador = decodeToken.tokenDecode();
 
@@ -48,7 +46,7 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, detalle, setDe
             idEjecucionPlanificacion: 0,
             idOperador: detalle.idOperador,
             idTienda: detalle.idTienda,
-            fecha: detalle.fecha,
+            fecha: '',
             horaInicio: '',
             horaE: 0,
             minutoE: 0,
@@ -93,22 +91,20 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, detalle, setDe
         />
     );
 
-    const handleSwitchChange = (e) => {
-
-        setShowFechaFin(e.target.checked);
-
-    };
-
     //####################################################################################################################################################
     //### FUNCIONES
 
-    const obtenerFechaHoraFormateada = (fecha, hora) => {
+    const obtenerFechaHoraFormateada = (fecha) => {
 
         const year = fecha.getFullYear();
         const month = (fecha.getMonth() + 1).toString().padStart(2, '0');
         const day = fecha.getDate().toString().padStart(2, '0');
+        const Hour = fecha.getHours().toString().padStart(2, '0');
+        const Min = fecha.getMinutes().toString().padStart(2, '0');
 
-        return `${year}-${month}-${day}T${hora}`;
+        console.log(`${year}-${month}-${day}T${Hour}:${Min}`)
+
+        return `${year}-${month}-${day}T${Hour}:${Min}`;
     }
 
     //####################################################################################################################################################
@@ -126,20 +122,6 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, detalle, setDe
                     <Modal.Title>Agregar Registro Individual de Planificación</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-
-                    <div className="row">
-                        <div className='col col-sm-6'>
-                            <Form.Group controlId="habilitarFechaFin">
-                                <Form.Check
-                                    type="switch"
-                                    name="habilitarFechaFin"
-                                    label="Agregar Rango"
-                                    onChange={handleSwitchChange}
-                                    disabled="true"
-                                />
-                            </Form.Group>
-                        </div>
-                    </div>
 
                     <div className="row">
 
@@ -195,7 +177,8 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, detalle, setDe
                                 <DatePicker
                                     id="fecha"
                                     name="fecha"
-                                    selected={detalle.fecha ? new Date(detalle.fecha) : null}
+                                    selected={formik.values.fecha ? new Date(formik.values.fecha) : null}
+                                    includeDateIntervals={[{ start: new Date(productividad.fechaDesde), end: new Date(productividad.fechaHasta) }]}
                                     onChange={(date) => formik.setFieldValue('fecha', date)}
                                     onBlur={formik.handleBlur}
                                     showMonthDropdown
@@ -209,58 +192,38 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, detalle, setDe
                         </div>
 
                         <div className='col col-sm-6'>
-                            <Form.Group controlId="fechaHasta">
-                                <Form.Label>Fecha Hasta:</Form.Label>
-                                <DatePicker
-                                    style={!showFechaFin ? { backgroundColor: "#D3D3D3" } : {}}
-                                    id="fechaHasta"
-                                    name="fechaHasta"
 
-                                    disabled={!showFechaFin}
-                                    selected={formik.values.fechaHasta ? new Date(formik.values.fechaHasta) : null}
-                                    onChange={(date) => formik.setFieldValue('fecha', date)}
-                                    onBlur={formik.handleBlur}
-                                    showMonthDropdown
-                                    showYearDropdown
-                                    customInput={<CustomInput />}
-                                />
-                                {formik.touched.fechaHasta && formik.errors.fechaHasta ? (
-                                    <Form.Text className="text-danger">{formik.errors.fechaHasta}</Form.Text>
-                                ) : null}
-                            </Form.Group>
                         </div>
 
                         <div className='col col-sm-6'>
-                            <Form.Group controlId="horaE">
+                            <Form.Group controlId="horaInicio">
                                 <Form.Label>Hora Entrada:</Form.Label>
                                 <Calendar
-                                    id="horaEw"
+                                    id="horaInicio"
                                     timeOnly
                                     locale="es"
                                     hourFormat="24"
                                     dateFormat="HH:mm:ss"
+                                    onChange={(date) => formik.setFieldValue('horaInicio', date)}
+                                    value={formik.values.horaFin ? formik.values.horaInicio : null}
                                 />
-                                {formik.touched.horaE && formik.errors.horaE ? (
-                                    <Form.Text className="text-danger">{formik.errors.horaE}</Form.Text>
-                                ) : null}
+                                {formik.touched.horaInicio && formik.errors.horaInicio ? (<Form.Text className="text-danger">{formik.errors.horaInicio}</Form.Text>) : null}
                             </Form.Group>
                         </div>
 
                         <div className='col col-sm-6'>
-                            <Form.Group controlId="horaF">
+                            <Form.Group controlId="horaFin">
                                 <Form.Label>Hora Salida:</Form.Label>
                                 <Calendar
-                                    id="horaFs"
-                                    value={new Date(obtenerFechaHoraFormateada(new Date(formik.values.fecha), formik.values.horaFin))}
-                                    appendTo={document.body}
+                                    id="horaFin"
                                     timeOnly
                                     locale="es"
                                     hourFormat="24"
                                     dateFormat="HH:mm:ss"
+                                    onChange={(date) => formik.setFieldValue('horaFin', date)}
+                                    value={formik.values.horaFin ? formik.values.horaFin : null}
                                 />
-                                {formik.touched.horaF && formik.errors.horaF ? (
-                                    <Form.Text className="text-danger">{formik.errors.horaF}</Form.Text>
-                                ) : null}
+                                {formik.touched.horaFin && formik.errors.horaFin ? (<Form.Text className="text-danger">{formik.errors.horaFin}</Form.Text>) : null}
                             </Form.Group>
                         </div>
                         <div className="col col-sm-6">
