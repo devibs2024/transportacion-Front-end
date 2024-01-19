@@ -10,8 +10,6 @@ import { useLocation } from "react-router-dom";
 import { useFormik } from 'formik';
 import { Form, Modal, Button } from "react-bootstrap";
 
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 import { Calendar } from 'primereact/calendar';
 
 import { accionExitosa, accionFallida } from '../../../shared/Utils/modals';
@@ -27,6 +25,8 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, productividad,
     const navigate = useNavigate();
     const location = useLocation();
 
+    const [error, setError] = useState(null);
+
     const idCoordinador = decodeToken.tokenDecode();
 
     const handleClose = () => setShow(false);
@@ -37,20 +37,21 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, productividad,
     useEffect(() => {
 
 
+
     }, [])
 
     const formik = useFormik({
         initialValues: {
             idPlanificacion: detalle.idPlanificacion,
-            idDetallePlanificacion: detalle.idDetallePlanificacion,
+            idDetallePlanificacion: 0,
             idEjecucionPlanificacion: 0,
             idOperador: detalle.idOperador,
             idTienda: detalle.idTienda,
             fecha: '',
-            horaInicio: '',
+            horaInicio: new Date(),
             horaE: 0,
             minutoE: 0,
-            horaFin: '',
+            horaFin: new Date(),
             horaF: 0,
             minutoF: 0,
             descanso: false,
@@ -62,23 +63,30 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, productividad,
 
         onSubmit: values => {
 
-            console.log(values);
+            let ejecucion = {
+                idPlanificacion: detalle.idPlanificacion,
+                idDetallePlanificacion: 0,
+                idEjecucionPlanificacion: 0,
+                idOperador: detalle.idOperador,
+                idTienda: detalle.idTienda,
+                fecha: formik.values.fecha,
+                horaInicio: formik.values.horaInicio,
+                horaE: 0,
+                minutoE: 0,
+                horaFin: formik.values.horaFin,
+                horaF: 0,
+                minutoF: 0,
+                descanso: formik.values.descanso,
+                incentivoFactura: 0,
+                descuentoTardanza: 0,
+                montoHorasExtras: 0,
+                justificacion: '',
+            };
 
-            //const detallesPlanificacion = {
-            //    //idDetallePlanificacion: detallePlanificacion?.idDetallePlanificacion,
-            //    idTienda: values.idTienda,
-            //    idOperador: values.idOperador,
-            //    //idPlanificacion: detallePlanificacion.idPlanificacion,
-            //    fecha: formatDateToYYYYMMDD(values.fecha),
-            //    horaE: formatDateToHours(values.horaE),
-            //    minutoE: formatDateToMinutes(values.horaE),
-            //    horaF: formatDateToHours(values.horaF),
-            //    minutoF: formatDateToMinutes(values.horaF),
-            //    fechaHasta: showFechaFin ? formatDateToYYYYMMDD(values.fechaHasta) : formatDateToYYYYMMDD(values.fecha),
-            //    descanso: values.descanso
-            //}
-            //postOrPutDetallePlanificacion(detallesPlanificacion, getDetallesPlanificacion, detallePlanificacion, setDetallesPlanificacion);
+            postDetallePlanificacion(ejecucion)
         }
+
+
     });
 
     const CustomInput = ({ value, onClick }) => (
@@ -94,18 +102,78 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, productividad,
     //####################################################################################################################################################
     //### FUNCIONES
 
-    const obtenerFechaHoraFormateada = (fecha) => {
+    const obtenerFechaHoraFormateada = (pFecha, pHora) => {
+
+        let fecha = new Date(pFecha)
 
         const year = fecha.getFullYear();
         const month = (fecha.getMonth() + 1).toString().padStart(2, '0');
         const day = fecha.getDate().toString().padStart(2, '0');
-        const Hour = fecha.getHours().toString().padStart(2, '0');
-        const Min = fecha.getMinutes().toString().padStart(2, '0');
+
+        let hora = new Date(pHora)
+
+        const Hour = hora.getHours().toString().padStart(2, '0');
+        const Min = hora.getMinutes().toString().padStart(2, '0');
 
         console.log(`${year}-${month}-${day}T${Hour}:${Min}`)
 
-        return `${year}-${month}-${day}T${Hour}:${Min}`;
+        return new Date(`${year}-${month}-${day}T${Hour}:${Min}`);
     }
+
+    //####################################################################################################################################################
+    //### API
+
+    const postDetallePlanificacion = async (pEjecucion) => {
+
+        try {
+
+            console.log(pEjecucion)
+
+            let HoraEntrada = new Date(pEjecucion.horaInicio)
+            let HoraSalida = new Date(pEjecucion.horaFin)
+
+            console.log(pEjecucion.horaInicio)
+            console.log(pEjecucion.horaFin)
+
+            let pEjecucionPlanificacion =
+            {
+                idPlanificacion: pEjecucion.idPlanificacion,
+                idDetallePlanificacion: pEjecucion.idDetallePlanificacion,
+                idEjecucionPlanificacion: pEjecucion.idEjecucionPlanificacion,
+                idOperador: pEjecucion.idOperador,
+                idTienda: pEjecucion.idTienda,
+                fecha: pEjecucion.fecha,
+                horaE: HoraEntrada.getHours(),
+                minutoE: HoraEntrada.getMinutes(),
+                horaF: HoraSalida.getHours(),
+                minutoF: HoraSalida.getMinutes(),
+                descanso: pEjecucion.descanso,
+                incentivoFactura: pEjecucion.incentivoFactura,
+                descuentoTardanza: pEjecucion.descuentoTardanza,
+                montoHorasExtras: pEjecucion.montoHorasExtras,
+                justificacion: pEjecucion.justificacion,
+            }
+
+            const response = await API.post("EjecucionPlanificaciones", pEjecucionPlanificacion);
+
+            if (response.status == 200 || response.status == 204) {
+                accionExitosa({ titulo: "Registro Individual de Productividad", mensaje: "¡Registro satisfactorio!" });
+            }
+
+        }
+        catch (er) {
+
+            if (er.response?.data) {
+                setError(er.response.data);
+                accionFallida({ titulo: 'E R R O R', mensaje: JSON.stringify(er.response.data) });
+            }
+            else {
+                accionFallida({ titulo: 'E R R O R', mensaje: er.message });
+            }
+
+        }
+
+    };
 
     //####################################################################################################################################################
     //### COMBOS
@@ -132,7 +200,7 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, productividad,
                                     value={detalle.idOperador}
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
-                                    disabled="true">
+                                >
                                     <option value="">Seleccione el Operador</option>
                                     {operadoresOptions.map((option) => (
                                         <option key={option.value} value={option.value}>
@@ -153,7 +221,7 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, productividad,
                                     value={detalle.idTienda}
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
-                                    disabled="true">
+                                >
                                     <option value="">Seleccione la Tienda</option>
                                     {tiendasOptions.map((option) => (
                                         <option key={option.value} value={option.value}>
@@ -172,40 +240,40 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, productividad,
                     <div className="row">
 
                         <div className='col col-sm-6'>
+
                             <Form.Group controlId="fecha">
-                                <Form.Label> Fecha </Form.Label>
-                                <DatePicker
-                                    id="fecha"
-                                    name="fecha"
-                                    selected={formik.values.fecha ? new Date(formik.values.fecha) : null}
-                                    includeDateIntervals={[{ start: new Date(productividad.fechaDesde), end: new Date(productividad.fechaHasta) }]}
-                                    onChange={(date) => formik.setFieldValue('fecha', date)}
-                                    onBlur={formik.handleBlur}
-                                    showMonthDropdown
-                                    showYearDropdown
-                                    customInput={<CustomInput />}
+                                <Form.Label> Fecha: </Form.Label>
+                                <Calendar
+                                    inputId="fecha"
+                                    dateFormat="mm/dd/yyyy"
+                                    minDate={new Date(productividad.fechaDesde)}
+                                    maxDate={new Date(productividad.fechaHasta)}
+                                    onChange={(e) => formik.setFieldValue('fecha', Date(e.target.value))}
+                                    value={new Date(formik.values.fecha)}
                                 />
-                                {formik.touched.fecha && formik.errors.fecha ? (
-                                    <Form.Text className="text-danger">{formik.errors.fecha}</Form.Text>
-                                ) : null}
+                                {formik.touched.fecha && formik.errors.fecha ? (<Form.Text className="text-danger">{formik.errors.fecha}</Form.Text>) : null}
                             </Form.Group>
+
                         </div>
 
                         <div className='col col-sm-6'>
-
                         </div>
+
+                    </div>
+
+                    <div className="row">
 
                         <div className='col col-sm-6'>
                             <Form.Group controlId="horaInicio">
                                 <Form.Label>Hora Entrada:</Form.Label>
                                 <Calendar
                                     id="horaInicio"
+                                    inputId="horaInicio"
                                     timeOnly
-                                    locale="es"
                                     hourFormat="24"
                                     dateFormat="HH:mm:ss"
-                                    onChange={(date) => formik.setFieldValue('horaInicio', date)}
-                                    value={formik.values.horaFin ? formik.values.horaInicio : null}
+                                    onChange={(e) => formik.setFieldValue('horaInicio', Date(e.target.value))}
+                                    value={new Date(formik.values.horaInicio)}
                                 />
                                 {formik.touched.horaInicio && formik.errors.horaInicio ? (<Form.Text className="text-danger">{formik.errors.horaInicio}</Form.Text>) : null}
                             </Form.Group>
@@ -216,32 +284,37 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, productividad,
                                 <Form.Label>Hora Salida:</Form.Label>
                                 <Calendar
                                     id="horaFin"
+                                    inputId="horaFin"
                                     timeOnly
                                     locale="es"
                                     hourFormat="24"
                                     dateFormat="HH:mm:ss"
-                                    onChange={(date) => formik.setFieldValue('horaFin', date)}
-                                    value={formik.values.horaFin ? formik.values.horaFin : null}
+                                    onChange={(e) => formik.setFieldValue('horaFin', e.target.value)}
+                                    value={new Date(formik.values.horaFin)}
                                 />
                                 {formik.touched.horaFin && formik.errors.horaFin ? (<Form.Text className="text-danger">{formik.errors.horaFin}</Form.Text>) : null}
                             </Form.Group>
                         </div>
+
+                    </div>
+
+                    <div className="row">
+
                         <div className="col col-sm-6">
                             <Form.Group controlId="descanso">
                                 <Form.Label>Descanso</Form.Label>
                                 <Form.Check
                                     type="switch"
                                     name="descanso"
-                                    checked={detalle.descanso}
+                                    checked={formik.values.descanso}
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
                                 />
-                                <Form.Text className="text-danger">
-                                    {formik.touched.descanso && formik.errors.descanso ? (
-                                        <div className="text-danger">{formik.errors.descanso}</div>
-                                    ) : null}
-                                </Form.Text>
+                                {formik.touched.descanso && formik.errors.descanso ? (<Form.Text className="text-danger">{formik.errors.descanso}</Form.Text>) : null}
                             </Form.Group>
+                        </div>
+
+                        <div className='col col-sm-6'>
                         </div>
 
                     </div>

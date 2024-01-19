@@ -32,10 +32,7 @@ export const StepChkInOut = () => {
         { label: 'Foto Entrada 3' },
         { label: 'Foto Entrada 4' },
     ];
-    // {
-    //label: 'Foto 2',
-    //command: (event) => { }
-    //},
+
     const checkOutItem = [
         { label: 'Foto Salida 1' },
         { label: 'Foto Salida 2' },

@@ -88,7 +88,7 @@ export const PantallaRegistroIndividualProductividad = () => {
 
         try {
 
-            changedCells.forEach((item) => { putDetallePlanificacion(item); });
+            changedCells.forEach((item) => { putEjecucionPlanificacion(item); });
 
             accionExitosa({ titulo: "Registro Individual de Productividad", mensaje: "¡Actualización satisfactoria!" });
 
@@ -172,7 +172,7 @@ export const PantallaRegistroIndividualProductividad = () => {
         }
     }
 
-    const putDetallePlanificacion = async (pEjecucion) => {
+    const putEjecucionPlanificacion = async (pEjecucion) => {
 
         try {
 
