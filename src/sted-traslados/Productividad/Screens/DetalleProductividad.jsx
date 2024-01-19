@@ -83,7 +83,7 @@ export const PantallaDetalleProductividad = () => {
             const response = await API.get(`ProductividadHeader/${pProductividad.idPlanificacion},${isNaN(pProductividad.idOperador) ? 0 : Number(pProductividad.idOperador)}`);
 
             if (response.status == 200 || response.status == 204) {
-                console.log(response.data)
+              
                 const dataWithDayOptions = response.data.map(item => {
 
                     // Primero, ordena lstDias de menor a mayor
