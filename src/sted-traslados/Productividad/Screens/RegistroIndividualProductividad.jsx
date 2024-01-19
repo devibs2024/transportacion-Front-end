@@ -3,6 +3,7 @@ import API from "../../../store/api";
 import React, { useState, useEffect, useRef } from 'react';
 
 import { useLocation, useNavigate } from 'react-router-dom';
+import { rutaServidor } from '../../../routes/rutaServidor';
 
 import { useFormik } from "formik";
 import { Form, Modal } from 'react-bootstrap';
@@ -82,9 +83,9 @@ export const PantallaRegistroIndividualProductividad = () => {
 
             changedCells.forEach((item) => { putDetallePlanificacion(item); });
 
-            getEjecuciones(detalle)
-
             accionExitosa({ titulo: "Registro Individual de Productividad", mensaje: "¡Actualización satisfactoria!" });
+
+            navigate(`${rutaServidor}/productividad/registroIndividualProductividad`, { state: { detalle: detalle } })
 
         }
         catch (er) {
@@ -103,6 +104,7 @@ export const PantallaRegistroIndividualProductividad = () => {
 
     const cancelarEjecucion = () => {
 
+        setEjecuciones([])
         getEjecuciones(detalle)
 
     }

@@ -27,7 +27,7 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, detalle, setDe
     const navigate = useNavigate();
     const location = useLocation();
 
-    const [showFechaFin, setShowFechaFin] = useState(false);          
+    const [showFechaFin, setShowFechaFin] = useState(false);
 
     const idCoordinador = decodeToken.tokenDecode();
 
@@ -37,7 +37,8 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, detalle, setDe
     //### EVENTOS
 
     useEffect(() => {
-        console.log(detalle)
+
+
     }, [])
 
     const formik = useFormik({
@@ -48,8 +49,10 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, detalle, setDe
             idOperador: detalle.idOperador,
             idTienda: detalle.idTienda,
             fecha: detalle.fecha,
+            horaInicio: '',
             horaE: 0,
             minutoE: 0,
+            horaFin: '',
             horaF: 0,
             minutoF: 0,
             descanso: false,
@@ -132,6 +135,7 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, detalle, setDe
                                     name="habilitarFechaFin"
                                     label="Agregar Rango"
                                     onChange={handleSwitchChange}
+                                    disabled="true"
                                 />
                             </Form.Group>
                         </div>
@@ -145,7 +149,8 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, detalle, setDe
                                 <Form.Control as="select"
                                     value={detalle.idOperador}
                                     onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}>
+                                    onBlur={formik.handleBlur}
+                                    disabled="true">
                                     <option value="">Seleccione el Operador</option>
                                     {operadoresOptions.map((option) => (
                                         <option key={option.value} value={option.value}>
@@ -165,7 +170,8 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, detalle, setDe
                                 <Form.Control as="select"
                                     value={detalle.idTienda}
                                     onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}>
+                                    onBlur={formik.handleBlur}
+                                    disabled="true">
                                     <option value="">Seleccione la Tienda</option>
                                     {tiendasOptions.map((option) => (
                                         <option key={option.value} value={option.value}>
@@ -212,7 +218,7 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, detalle, setDe
 
                                     disabled={!showFechaFin}
                                     selected={formik.values.fechaHasta ? new Date(formik.values.fechaHasta) : null}
-                                    onChange={(date) => formik.setFieldValue('fechaHasta', date)}
+                                    onChange={(date) => formik.setFieldValue('fecha', date)}
                                     onBlur={formik.handleBlur}
                                     showMonthDropdown
                                     showYearDropdown
@@ -228,9 +234,7 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, detalle, setDe
                             <Form.Group controlId="horaE">
                                 <Form.Label>Hora Entrada:</Form.Label>
                                 <Calendar
-                                    id="horaE"
-                                    value={new Date(obtenerFechaHoraFormateada(new Date(detalle.fecha), detalle.horaInicioEjecucion))}
-                                    appendTo={document.body}
+                                    id="horaEw"
                                     timeOnly
                                     locale="es"
                                     hourFormat="24"
@@ -245,17 +249,14 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, detalle, setDe
                         <div className='col col-sm-6'>
                             <Form.Group controlId="horaF">
                                 <Form.Label>Hora Salida:</Form.Label>
-                                <DatePicker
-                                    id="horaF"
-                                    name="horaF"
-                                    selected={formik.values.horaF ? new Date(formik.values.horaF) : null}
-                                    onChange={(date) => formik.setFieldValue('horaF', date)}
-                                    onBlur={formik.handleBlur}
-                                    showTimeSelect
-                                    showTimeSelectOnly
-                                    timeFormat="HH:mm"
-                                    dateFormat="HH:mm"
-                                    customInput={<CustomInput />}
+                                <Calendar
+                                    id="horaFs"
+                                    value={new Date(obtenerFechaHoraFormateada(new Date(formik.values.fecha), formik.values.horaFin))}
+                                    appendTo={document.body}
+                                    timeOnly
+                                    locale="es"
+                                    hourFormat="24"
+                                    dateFormat="HH:mm:ss"
                                 />
                                 {formik.touched.horaF && formik.errors.horaF ? (
                                     <Form.Text className="text-danger">{formik.errors.horaF}</Form.Text>
@@ -268,7 +269,6 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, detalle, setDe
                                 <Form.Check
                                     type="switch"
                                     name="descanso"
-
                                     checked={detalle.descanso}
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
