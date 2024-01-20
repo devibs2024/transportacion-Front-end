@@ -89,11 +89,7 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, productividad,
                 justificacion: '',
             };
 
-            postDetallePlanificacion(ejecucion);
-
-            getEjecuciones(detalle);
-
-            setShow(false);
+            postDetallePlanificacion(ejecucion);          
 
         }
 
@@ -178,7 +174,11 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, productividad,
             const response = await API.post("EjecucionPlanificaciones", pEjecucionPlanificacion);
 
             if (response.status == 200 || response.status == 204) {
+
+                getEjecuciones(detalle);
                 accionExitosa({ titulo: "Registro Individual de Productividad", mensaje: "¡Registro satisfactorio!" });
+                setShow(false);
+
             }
 
         }
