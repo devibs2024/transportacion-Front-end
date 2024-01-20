@@ -63,7 +63,7 @@ export const PantallaRegistroIndividualProductividad = () => {
             getEjecuciones(location.state?.detalle)
         }
         else
-            accionFallida({ titulo: 'E R R O R', mensaje: 'FALTA INFORMACIÓN' });
+            accionFallida({ titulo: 'E R R O R', mensaje: 'FALTA INFORMACIï¿½N' });
 
     }, [])
 
@@ -90,7 +90,7 @@ export const PantallaRegistroIndividualProductividad = () => {
 
             changedCells.forEach((item) => { putEjecucionPlanificacion(item); });
 
-            accionExitosa({ titulo: "Registro Individual de Productividad", mensaje: "¡Actualización satisfactoria!" });
+            accionExitosa({ titulo: "Registro Individual de Productividad", mensaje: "ï¿½Actualizaciï¿½n satisfactoria!" });
 
             navigate(`${rutaServidor}/productividad/registroIndividualProductividad`, { state: { detalle: detalle } })
 
@@ -445,6 +445,8 @@ export const PantallaRegistroIndividualProductividad = () => {
                     productividad={productividad}
                     detalle={detalle}
                     setDetalle={setDetalle}
+                    ejecuciones={ejecuciones}
+                    setEjecuciones={setEjecuciones}
                 />
 
                 <div className="flex flex-wrap gap-3 justify-content-center justify-content-between">

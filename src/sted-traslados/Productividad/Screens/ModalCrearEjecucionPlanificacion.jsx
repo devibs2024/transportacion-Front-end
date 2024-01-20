@@ -23,7 +23,7 @@ import { accionExitosa, accionFallida } from '../../../shared/Utils/modals';
 import { useGetEmpleadoCoordinadores } from "../../../hooks/useGetEmpleadoCoordinador";
 import { useGetTiendaCoordinadores } from "../../../hooks/useGetTiendaCoordinador";
 
-export const ModalCrearEjecucionPlanificacion = ({ show, setShow, productividad, detalle, setDetalle }) => {
+export const ModalCrearEjecucionPlanificacion = ({ show, setShow, productividad, detalle, setDetalle, ejecuciones, setEjecuciones }) => {
 
     //####################################################################################################################################################
     //### VARIABLES GLOBALES
@@ -89,9 +89,13 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, productividad,
                 justificacion: '',
             };
 
-            postDetallePlanificacion(ejecucion)
-        }
+            postDetallePlanificacion(ejecucion);
 
+            getEjecuciones(detalle);
+
+            setShow(false);
+
+        }
 
     });
 
@@ -118,6 +122,32 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, productividad,
 
     //####################################################################################################################################################
     //### API
+
+    const getEjecuciones = async (pDetalle) => {
+
+        try {
+
+            setEjecuciones([])
+
+            const response = await API.get(`Productividad/${pDetalle.idPlanificacion},${Number(pDetalle.idOperador)}`);
+
+            if (response.status == 200 || response.status == 204) {
+                setEjecuciones(response.data);
+            }
+
+        }
+        catch (er) {
+
+            if (er.response?.data) {
+                setError(er.response.data);
+                accionFallida({ titulo: 'E R R O R', mensaje: JSON.stringify(er.response.data) });
+            }
+            else {
+                accionFallida({ titulo: 'E R R O R', mensaje: er.message });
+            }
+
+        }
+    }
 
     const postDetallePlanificacion = async (pEjecucion) => {
 
