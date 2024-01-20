@@ -53,11 +53,11 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, productividad,
             idEjecucionPlanificacion: 0,
             idOperador: detalle.idOperador,
             idTienda: detalle.idTienda,
-            fecha: new Date(),
-            horaInicio: new Date(),
+            fecha: '',
+            horaInicio: '',
             horaE: 0,
             minutoE: 0,
-            horaFin: new Date(),
+            horaFin: '',
             horaF: 0,
             minutoF: 0,
             descanso: false,
@@ -108,6 +108,13 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, productividad,
     //####################################################################################################################################################
     //### FUNCIONES
 
+    const strFecha = (date) => {
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+
+        return `${year}-${month}-${day}`;
+    };
 
     //####################################################################################################################################################
     //### API
@@ -115,7 +122,7 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, productividad,
     const postDetallePlanificacion = async (pEjecucion) => {
 
         try {
-          
+
             let HoraEntrada = new Date(pEjecucion.horaInicio)
             let HoraSalida = new Date(pEjecucion.horaFin)
 
@@ -126,7 +133,7 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, productividad,
                 idEjecucionPlanificacion: pEjecucion.idEjecucionPlanificacion,
                 idOperador: pEjecucion.idOperador,
                 idTienda: pEjecucion.idTienda,
-                fecha: pEjecucion.fecha,
+                fecha: strFecha(pEjecucion.fecha),
                 horaE: HoraEntrada.getHours(),
                 minutoE: HoraEntrada.getMinutes(),
                 horaF: HoraSalida.getHours(),
@@ -137,8 +144,6 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, productividad,
                 montoHorasExtras: pEjecucion.montoHorasExtras,
                 justificacion: pEjecucion.justificacion,
             }
-
-            console.log(pEjecucionPlanificacion)
 
             const response = await API.post("EjecucionPlanificaciones", pEjecucionPlanificacion);
 
