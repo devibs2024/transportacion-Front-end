@@ -135,7 +135,7 @@ export const PantallaDetalleNomina = () => {
                 fechaEnd: formik.values.fechaHasta,
                 procesado: true
             };
-
+            
             setNomina(nomina)
             putPago(nomina)
 

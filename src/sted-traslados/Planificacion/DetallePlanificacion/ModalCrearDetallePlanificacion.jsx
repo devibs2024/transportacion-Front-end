@@ -6,9 +6,16 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { getOperadores, getTiendas, postOrPutDetallePlanificacion, getDetallesPlanificacion } from "./detallePlanificacionUtils";
 
+import * as decodeToken from '../../../shared/Utils/decodeToken';
+
+import { useGetEmpleadoCoordinadores } from "../../../hooks/useGetEmpleadoCoordinador";
+import { useGetTiendaCoordinadores } from "../../../hooks/useGetTiendaCoordinador";
+
 export const ModalCrearDetallePlanificacion = ({ detallePlanificacion, planificacion, show, setShow, setDetallesPlanificacion, getDetallesPlanificacion }) => {
 
-   
+
+    const idCoordinador = decodeToken.tokenDecode();
+
     const [showFechaFin, setShowFechaFin] = useState(false);
     const handleSwitchChange = (e) => {
         setShowFechaFin(e.target.checked);
@@ -79,15 +86,10 @@ export const ModalCrearDetallePlanificacion = ({ detallePlanificacion, planifica
 
         return date;
     }
-    const operadoresOptions = operadores.map(s => ({
-        value: s.idEmpleado,
-        label: s.nombres
-    }));
 
-    const tiendasOptions = tiendas.map(t => ({
-        value: t.idTienda,
-        label: t.nombreTienda
-    }));
+    const operadoresOptions = useGetEmpleadoCoordinadores(idCoordinador).map((list) => ({ value: list.idOperador, label: list.nombres }));
+    const tiendasOptions = useGetTiendaCoordinadores(idCoordinador).map((list) => ({ value: list.idTienda, label: list.nombreTienda }));
+
 
     const formik = useFormik({
         initialValues: {

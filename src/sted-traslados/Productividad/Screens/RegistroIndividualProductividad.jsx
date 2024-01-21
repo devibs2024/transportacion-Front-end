@@ -1,6 +1,7 @@
 import API from "../../../store/api";
 
 import React, { useState, useEffect, useRef } from 'react';
+import * as decodeToken from '../../../shared/Utils/decodeToken';
 
 import { useLocation, useNavigate } from 'react-router-dom';
 import { rutaServidor } from '../../../routes/rutaServidor';
@@ -17,8 +18,12 @@ import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Calendar } from 'primereact/calendar';
+import { Dropdown } from 'primereact/dropdown';
 
 import { accionExitosa, accionFallida } from '../../../shared/Utils/modals';
+
+import { useGetEmpleadoCoordinadores } from "../../../hooks/useGetEmpleadoCoordinador";
+import { useGetTiendaCoordinadores } from "../../../hooks/useGetTiendaCoordinador";
 
 export const PantallaRegistroIndividualProductividad = () => {
 
@@ -41,6 +46,7 @@ export const PantallaRegistroIndividualProductividad = () => {
     const handleShow = () => setShow(true);
     const handleClose = () => setShow(false);
 
+    const idCoordinador = decodeToken.tokenDecode();
 
     //####################################################################################################################################################
     //### EVENTOS
@@ -60,10 +66,12 @@ export const PantallaRegistroIndividualProductividad = () => {
             formik.setValues(location.state.detalle);
             setDetalle(location.state.detalle);
 
-            getEjecuciones(location.state?.detalle)
+            getEjecuciones(location.state.detalle)
+            getOperadorVehiculos(location.state.detalle)
+
         }
         else
-            accionFallida({ titulo: 'E R R O R', mensaje: 'FALTA INFORMACI�N' });
+            accionFallida({ titulo: 'E R R O R', mensaje: 'FALTA INFORMACIÓN' });
 
     }, [])
 
@@ -90,7 +98,7 @@ export const PantallaRegistroIndividualProductividad = () => {
 
             changedCells.forEach((item) => { putEjecucionPlanificacion(item); });
 
-            accionExitosa({ titulo: "Registro Individual de Productividad", mensaje: "�Actualizaci�n satisfactoria!" });
+            accionExitosa({ titulo: "Registro Individual de Productividad", mensaje: "¡Actualización satisfactoria!" });
 
             navigate(`${rutaServidor}/productividad/registroIndividualProductividad`, { state: { detalle: detalle } })
 
@@ -196,6 +204,7 @@ export const PantallaRegistroIndividualProductividad = () => {
                 descuentoTardanza: pEjecucion.descuentoTardanza,
                 montoHorasExtras: pEjecucion.montoHorasExtras,
                 justificacion: pEjecucion.justificacion,
+                idVehiculo: pEjecucion.idVehiculo,
             }
 
             const response = await API.put(`EjecucionPlanificaciones/${pEjecucionPlanificacion.idEjecucionPlanificacion}`, pEjecucionPlanificacion);
@@ -218,9 +227,26 @@ export const PantallaRegistroIndividualProductividad = () => {
 
     };
 
+    const getOperadorVehiculos = async (pDetalle) => {
+
+        const response = await API.get(`OperadorVehiculo/${pDetalle.idOperador}`);
+
+        if (response.status == 200 || response.status == 204) {
+
+            let data = response.data.map((list) => ({ value: list.vehiculo.idVehiculo, label: list.vehiculo.nombreVehiculo }));
+
+            setOperadorVehiculosOptions(data)
+
+        }
+
+    }
+
     //####################################################################################################################################################
     //### COMBOS
 
+    const operadoresOptions = useGetEmpleadoCoordinadores(idCoordinador).map((list) => ({ value: list.idOperador, label: list.nombres }));
+    const tiendasOptions = useGetTiendaCoordinadores(idCoordinador).map((list) => ({ value: list.idTienda, label: list.nombreTienda }));
+    const [operadorVehiculosOptions, setOperadorVehiculosOptions] = useState([])
 
     //####################################################################################################################################################
     //### LISTADO
@@ -293,6 +319,40 @@ export const PantallaRegistroIndividualProductividad = () => {
 
     };
 
+    const onListVehiculosChange = (e, rowData) => {
+
+        rowData.idVehiculo = e.value;
+
+        if (e.value > 0) {
+            let selecion = operadorVehiculosOptions.filter(x => x.value == e.value)
+            if (selecion.length == 1)
+                rowData.nombreVehiculo = selecion[0].label;
+        }
+
+        let updatedProductividades = [...ejecuciones];
+        let index = updatedProductividades.findIndex(data => data.idDetallePlanificacion === rowData.idDetallePlanificacion);
+        updatedProductividades[index].idVehiculo = e.value;
+        updatedProductividades[index].nombreVehiculo = rowData.nombreVehiculo;
+        setEjecuciones(updatedProductividades);
+
+        setChangedCells(prev => {
+
+            const index = prev.findIndex(el => el.idDetallePlanificacion === rowData.idDetallePlanificacion);
+
+            if (index !== -1) {
+                return [
+                    ...prev.slice(0, index),
+                    rowData,
+                    ...prev.slice(index + 1)
+                ];
+            }
+            else {
+                return [...prev, rowData];
+            }
+        });
+
+    };
+
     const isCellChanged = (id) => {
 
         return changedCells.find(cell => cell.id === id)?.changed;
@@ -333,6 +393,11 @@ export const PantallaRegistroIndividualProductividad = () => {
 
     };
 
+    const renderListVehiculos = (props) => {
+        return (
+            <Dropdown id={props.rowData.idDetallePlanificacion} value={props.rowData.idVehiculo} options={operadorVehiculosOptions} onChange={(e) => onListVehiculosChange(e, props.rowData)} placeholder="Selecciona un Vehículo" />
+        );
+    };
 
     //####################################################################################################################################################
     //### LISTADO | FILTROS
@@ -447,6 +512,9 @@ export const PantallaRegistroIndividualProductividad = () => {
                     setDetalle={setDetalle}
                     ejecuciones={ejecuciones}
                     setEjecuciones={setEjecuciones}
+                    operadoresOptions={operadoresOptions}
+                    tiendasOptions={tiendasOptions}
+                    operadorVehiculosOptions={operadorVehiculosOptions}
                 />
 
                 <div className="flex flex-wrap gap-3 justify-content-center justify-content-between">
@@ -546,6 +614,24 @@ export const PantallaRegistroIndividualProductividad = () => {
                             }
                             filter
                             filterPlaceholder="Buscar por hora fin"
+                            style={{ minWidth: '12rem' }} />
+
+                        <Column
+                            field="idVehiculo"
+                            header="Vehículo"
+                            body=
+                            {
+                                (rowData) =>
+                                    <div style={isCellChanged(rowData.idEjecucionPlanificacion + 'idVehiculo') ? { border: '1px solid red' } : {}}>
+                                        {rowData.nombreVehiculo}
+                                    </div>
+                            }
+                            editor=
+                            {
+                                (props) => renderListVehiculos(props)
+                            }
+                            filter
+                            filterPlaceholder="Buscar por vehiculo"
                             style={{ minWidth: '12rem' }} />
 
                         <Column

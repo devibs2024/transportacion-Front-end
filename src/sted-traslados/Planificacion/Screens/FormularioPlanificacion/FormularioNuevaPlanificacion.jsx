@@ -12,9 +12,11 @@ import API from '../../../../store/api';
 import { accionExitosa, accionFallida } from '../../../../shared/Utils/modals';
 import { procesarErrores } from '../../../../shared/Utils/procesarErrores'
 import * as Yup from 'yup';
-
+import * as decodeToken from '../../../../shared/Utils/decodeToken';
 
 export const FormularioNuevaPlanificacion = ({ setPlanificacion, planificacion }) => {
+
+    const idCoordinador = decodeToken.tokenDecode();
 
     const [idPlanificacion, setIdPlanificacion] = useState(0);
 
@@ -91,7 +93,7 @@ export const FormularioNuevaPlanificacion = ({ setPlanificacion, planificacion }
             fechaDesde: '',
             fechaHasta: '',
             comentario: '',
-            idCoordinador: 0,
+            idCoordinador: idCoordinador,
             frecuenciaId: 0
         });
         
@@ -102,7 +104,7 @@ export const FormularioNuevaPlanificacion = ({ setPlanificacion, planificacion }
             fechaDesde: '',
             fechaHasta: '',
             comentario: '',
-            idCoordinador: 0,
+            idCoordinador: idCoordinador,
             frecuenciaId: 0
         }
     }

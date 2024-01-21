@@ -1,7 +1,5 @@
 import API from "../../../store/api";
 
-import * as decodeToken from '../../../shared/Utils/decodeToken';
-
 import { useEffect, useState } from "react";
 
 import { useNavigate } from "react-router";
@@ -20,10 +18,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 import { accionExitosa, accionFallida } from '../../../shared/Utils/modals';
 
-import { useGetEmpleadoCoordinadores } from "../../../hooks/useGetEmpleadoCoordinador";
-import { useGetTiendaCoordinadores } from "../../../hooks/useGetTiendaCoordinador";
-
-export const ModalCrearEjecucionPlanificacion = ({ show, setShow, productividad, detalle, setDetalle, ejecuciones, setEjecuciones }) => {
+export const ModalCrearEjecucionPlanificacion = ({ show, setShow, productividad, detalle, setDetalle, ejecuciones, setEjecuciones, operadoresOptions, tiendasOptions, operadorVehiculosOptions }) => {
 
     //####################################################################################################################################################
     //### VARIABLES GLOBALES
@@ -33,15 +28,12 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, productividad,
 
     const [error, setError] = useState(null);
 
-    const idCoordinador = decodeToken.tokenDecode();
-
     const handleClose = () => setShow(false);
 
     //####################################################################################################################################################
     //### EVENTOS
 
     useEffect(() => {
-
 
 
     }, [])
@@ -65,6 +57,7 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, productividad,
             descuentoTardanza: 0,
             montoHorasExtras: 0,
             justificacion: '',
+            idVehiculo: 0,
         },
 
         onSubmit: values => {
@@ -87,9 +80,10 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, productividad,
                 descuentoTardanza: 0,
                 montoHorasExtras: 0,
                 justificacion: '',
+                idVehiculo: formik.values.idVehiculo,
             };
 
-            postDetallePlanificacion(ejecucion);          
+            postDetallePlanificacion(ejecucion);
 
         }
 
@@ -169,6 +163,8 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, productividad,
                 descuentoTardanza: pEjecucion.descuentoTardanza,
                 montoHorasExtras: pEjecucion.montoHorasExtras,
                 justificacion: pEjecucion.justificacion,
+                tipoRegistro: 1,
+                idVehiculo: pEjecucion.idVehiculo,
             }
 
             const response = await API.post("EjecucionPlanificaciones", pEjecucionPlanificacion);
@@ -197,10 +193,7 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, productividad,
     };
 
     //####################################################################################################################################################
-    //### COMBOS
-
-    const operadoresOptions = useGetEmpleadoCoordinadores(idCoordinador).map((list) => ({ value: list.idOperador, label: list.nombres }));
-    const tiendasOptions = useGetTiendaCoordinadores(idCoordinador).map((list) => ({ value: list.idTienda, label: list.nombreTienda }));
+    //### COMBOS   
 
     return (
         <Modal show={show} onHide={handleClose}>
@@ -262,6 +255,36 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, productividad,
                                     </Form.Text>
                                 </Form.Group>
 
+                            </Col>
+
+                        </Row>
+
+                        <Row>
+
+                            <Col>
+
+                                <Form.Group controlId="idVehiculo">
+                                    <Form.Label>Vehículo:</Form.Label>
+                                    <Form.Control as="select"
+                                        value={formik.values.idVehiculo}
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                    >
+                                        <option value="">Seleccione el Vehículo</option>
+                                        {operadorVehiculosOptions.map((option) => (
+                                            <option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </option>
+                                        ))}
+                                    </Form.Control>
+                                    <Form.Text className="text-danger">
+                                        {formik.touched.idVehiculo && formik.errors.idVehiculo ? (<div className="text-danger">{formik.errors.idVehiculo}</div>) : null}
+                                    </Form.Text>
+                                </Form.Group>
+
+                            </Col>
+
+                            <Col>
                             </Col>
 
                         </Row>

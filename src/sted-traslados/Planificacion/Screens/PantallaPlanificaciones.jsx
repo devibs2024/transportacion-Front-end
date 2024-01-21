@@ -10,8 +10,11 @@ import { useNavigate } from 'react-router-dom';
 import { Toolbar } from 'primereact/toolbar';
 import { CustomCard } from '../../../shared/card-custom';
 import { rutaServidor } from '../../../routes/rutaServidor';
+import * as decodeToken from '../../../shared/Utils/decodeToken';
 
 export const PantallaPlanificaciones = () => {
+
+    const idCoordinador = decodeToken.tokenDecode();
 
     const [planificaciones, setPlanificaciones] = useState([]);
 
@@ -33,7 +36,7 @@ export const PantallaPlanificaciones = () => {
 
     const getPlanificaciones = async () => {
 
-        const response = await API.get(`Planificaciones`);
+        const response = await API.get(`Planificaciones/${idCoordinador},0`);
 
         if (response.status == 200 || response.status == 204) {
 

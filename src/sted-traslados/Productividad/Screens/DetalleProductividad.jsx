@@ -19,8 +19,6 @@ import { InputText } from 'primereact/inputtext';
 
 import { accionFallida } from '../../../shared/Utils/modals';
 
-import { NUM } from 'xlsx-populate/lib/FormulaError';
-
 export const PantallaDetalleProductividad = () => {
 
 
@@ -35,6 +33,8 @@ export const PantallaDetalleProductividad = () => {
 
     const [productividad, setProductividad] = useState([]);
     const [detalles, setDetalles] = useState([]);
+
+    const idCoordinador = decodeToken.tokenDecode();
 
 
     //####################################################################################################################################################
