@@ -73,7 +73,8 @@ export const PantallaDetalleNomina = () => {
             idOperador: 0,
             idTienda: 0,
             fechaDesde: productividad.fechaDesde,
-            fechaHasta: productividad.fechaHasta
+            fechaHasta: productividad.fechaHasta,
+            procesar: false,
         }
 
     }
@@ -84,6 +85,7 @@ export const PantallaDetalleNomina = () => {
         onSubmit: values => {
 
             let idProcesoNomina = 0
+            formik.values.procesar = false;
 
             let nomina = {
                 idProcesoNomina: 0,
@@ -105,6 +107,7 @@ export const PantallaDetalleNomina = () => {
     const getComprobanteNomina = () => {
 
         let idProcesoNomina = 0
+        formik.values.procesar = false;
 
         let nomina = {
             idProcesoNomina: 0,
@@ -167,8 +170,10 @@ export const PantallaDetalleNomina = () => {
 
             const response = await API.get(`Nomina/Calculo/${Number(pNomina.idPlanificacion)},${pNomina.fechaIni},${pNomina.fechaEnd},${Number(pNomina.idCoordinador)},${Number(pNomina.idOperador)},${Number(pNomina.idTienda)}`);
 
-            if (response.status == 200 || response.status == 204)
+            if (response.status == 200 || response.status == 204) {
                 setComprobantes(response.data);
+                formik.values.procesar = true;
+            }
 
         }
         catch (er) {
@@ -193,9 +198,10 @@ export const PantallaDetalleNomina = () => {
 
             const response = await API.get(`Nomina/Consulta/${Number(pNomina.idProcesoNomina)},${Number(pNomina.idPlanificacion)},${pNomina.fechaIni},${pNomina.fechaEnd},${Number(pNomina.idCoordinador)},${Number(pNomina.idOperador)},${Number(pNomina.idTienda)}`);
 
-            if (response.status == 200 || response.status == 204)
+            if (response.status == 200 || response.status == 204) {
                 setComprobantes(response.data);
-
+                formik.values.procesar = false;
+            }
         }
         catch (er) {
 
@@ -221,6 +227,7 @@ export const PantallaDetalleNomina = () => {
             if (response.status == 200 || response.status == 204) {
 
                 setComprobantes([])
+                formik.values.procesar = false;
                 accionExitosa({ titulo: 'E X I T O', mensaje: "Nómina pagada" })
 
             }
@@ -485,6 +492,7 @@ export const PantallaDetalleNomina = () => {
                             label="Pago"
                             icon="pi pi-plus right"
                             iconPos="right"
+                            disabled={formik.values.procesar ? false : true}
                         >
                         </Button>
 
