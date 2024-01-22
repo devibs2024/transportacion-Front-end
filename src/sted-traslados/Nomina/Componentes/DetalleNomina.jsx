@@ -35,7 +35,7 @@ export const PantallaDetalleNomina = () => {
     const location = useLocation();
 
     const [show, setShow] = useState(false);
-    const [error, setError] = useState(null); 
+    const [error, setError] = useState(null);
 
     const [productividad, setProductividad] = useState([]);
     const [comprobantes, setComprobantes] = useState([]);
@@ -138,7 +138,7 @@ export const PantallaDetalleNomina = () => {
                 fechaEnd: formik.values.fechaHasta,
                 procesado: true
             };
-            
+
             setNomina(nomina)
             putPago(nomina)
 
@@ -157,6 +157,25 @@ export const PantallaDetalleNomina = () => {
         setShow(true);
     }
 
+    //####################################################################################################################################################
+    //### FUNCIONES
+
+
+    const strMoneda = new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", minimumFractionDigits: 2, });
+
+    const strFecha = (date) => {
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    const strFechaList = (date) => {
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        return `${month}/${day}/${year}`;
+    };
 
     //####################################################################################################################################################
     //### API
@@ -542,7 +561,7 @@ export const PantallaDetalleNomina = () => {
 
         <div className="mt-5">
 
-            <CustomCard  title="Calculo de Nomina">
+            <CustomCard title="Calculo de Nomina">
                 <div className="p-3">
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
                     <DataTable
@@ -574,20 +593,22 @@ export const PantallaDetalleNomina = () => {
                             style={{ minWidth: '12rem' }}
                         />
                         <Column field="operador" header="Operador" filter filterPlaceholder="Buscar por operador" style={{ minWidth: '12rem' }}></Column>
-                        <Column field="spot" header="Spot" style={{ minWidth: '12rem' }}></Column>
+                        <Column field="spot" header="Spot" style={{ minWidth: '12rem', textAlign: 'center' }}></Column>
                         <Column field="banco" header="Banco" style={{ minWidth: '12rem' }}></Column>
                         <Column field="tarjeta" header="Tarjeta" style={{ minWidth: '12rem' }}></Column>
-                        <Column field="dias" header="Dias" style={{ minWidth: '12rem' }}></Column>
-                        <Column field="salario" header="Sueldo" style={{ minWidth: '12rem' }}></Column>
-                        <Column field="subTotal1" header="SubTotal" style={{ minWidth: '12rem' }}></Column>
-                        <Column field="descuento" header="Desc." style={{ minWidth: '12rem' }}></Column>
-                        <Column field="bono" header="Bono" style={{ minWidth: '12rem' }}></Column>
-                        <Column field="gasolina" header="Gasolina" style={{ minWidth: '12rem' }}></Column>
-                        <Column field="subTotal2" header="SubTotal" style={{ minWidth: '12rem' }}></Column>
-                        <Column field="smg" header="SMG" style={{ minWidth: '12rem' }}></Column>
-                        <Column field="total" header="Total" style={{ minWidth: '12rem' }}></Column>
-                        <Column field="sted" header="STED" style={{ minWidth: '12rem' }}></Column>
-                        <Column field="pago" header="Pago" style={{ minWidth: '12rem' }}></Column>
+                        <Column field="dias" header="Dias" style={{ minWidth: '12rem', textAlign: 'center' }}></Column>
+
+                        <Column field="salario" header="Sueldo" body={(rowData) => strMoneda.format(rowData.salario)} style={{ minWidth: '12rem', textAlign: 'right' }}></Column>
+                        <Column field="subTotal1" header="SubTotal" body={(rowData) => strMoneda.format(rowData.subTotal1)} style={{ minWidth: '12rem', textAlign: 'right' }}></Column>
+                        <Column field="descuento" header="Desc." body={(rowData) => strMoneda.format(rowData.descuento)} style={{ minWidth: '12rem', textAlign: 'right' }}></Column>
+                        <Column field="bono" header="Bono" body={(rowData) => strMoneda.format(rowData.bono)} style={{ minWidth: '12rem', textAlign: 'right' }}></Column>
+                        <Column field="gasolina" header="Gasolina" body={(rowData) => strMoneda.format(rowData.gasolina)} style={{ minWidth: '12rem', textAlign: 'right' }}></Column>
+                        <Column field="subTotal2" header="SubTotal" body={(rowData) => strMoneda.format(rowData.subTotal2)} style={{ minWidth: '12rem', textAlign: 'right' }}></Column>
+                        <Column field="smg" header="SMG" body={(rowData) => strMoneda.format(rowData.smg)} style={{ minWidth: '12rem', textAlign: 'right' }}></Column>
+                        <Column field="total" header="Total" body={(rowData) => strMoneda.format(rowData.total)} style={{ minWidth: '12rem', textAlign: 'right' }}></Column>
+                        <Column field="sted" header="STED" body={(rowData) => strMoneda.format(rowData.sted)} style={{ minWidth: '12rem', textAlign: 'right' }}></Column>
+                        <Column field="pago" header="Pago" body={(rowData) => strMoneda.format(rowData.pago)} style={{ minWidth: '12rem', textAlign: 'right' }}></Column>
+
                     </DataTable>
                 </div>
             </CustomCard>

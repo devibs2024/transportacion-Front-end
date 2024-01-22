@@ -432,14 +432,14 @@ export const PantallaReporteGasolinaOperador = () => {
                         <Column 
                             field='importe' 
                             header="Importe" 
-                            style={{ minWidth: '12rem' }}
+                            style={{ minWidth: '12rem', textAlign: 'right' }}
                             body={(rowData) =>  strMoneda.format(rowData.importe)}
                         >
                         </Column>
                         <Column 
                             field='fechaDispersion' 
                             header="Fecha Dispersión" 
-                            style={{ minWidth: '12rem' }}
+                            style={{ minWidth: '12rem', textAlign: 'center' }}
                             body={(rowData) => strFechaList(new Date( rowData.fechaDispersion))}
                         ></Column>
                     </DataTable>
