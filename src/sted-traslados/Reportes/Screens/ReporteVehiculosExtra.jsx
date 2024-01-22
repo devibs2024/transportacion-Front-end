@@ -116,6 +116,7 @@ export const PantallaReporteVehiculosExtra = () => {
 
             if (response.status == 200 || response.status == 204) {
                 setRegistrosReporte(response.data);
+                console.log(response.data)
             }
 
         }
