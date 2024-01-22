@@ -179,6 +179,11 @@ export const AppLayout = ({ children }) => {
                     label: 'Reporte de Vehiculos Extra Utilizados',
                     command: () => navigate(rutaServidor + '/Reportes/ReporteVehiculosExtra'),
                     element: <Link to={rutaServidor + '/Reportes/ReporteVehiculosExtra'}></Link>
+                },
+                {
+                    label: 'Reporte Comparativo de Pagos Sted',
+                    command: () => navigate(rutaServidor + '/Reportes/ReporteComparativoPagos'),
+                    element: <Link to={rutaServidor + '/Reportes/ReporteComparativoPagos'}></Link>
                 }
             ]
         },

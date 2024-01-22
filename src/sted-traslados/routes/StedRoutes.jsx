@@ -38,53 +38,55 @@ import { PantallaNomina } from "../Nomina/Screens/Nomina";
 import { PantallaDetalleNomina } from "../Nomina/Componentes/DetalleNomina";
 import { PantallaReporteGasolinaOperador } from '../Reportes/Screens/ReporteGasolina';
 import { PantallaReporteVehiculosExtra } from "../Reportes/Screens/ReporteVehiculosExtra";
+import { PantallaReporteComparativoPagos } from "../Reportes/Screens/ReporteComparativoPagos";
 
 export const StedRoutes = () => {
 
-  const rutaServidor = "/";
+    const rutaServidor = "/";
 
-  return (
-    <AppLayout>
-      <Routes>
-        <Route path={rutaServidor + "/inicio"} element={<PantallaInicio />} />
-        <Route path={rutaServidor + "/operador/crear"} element={<PantallaNuevoOperador />} />
-        <Route path={rutaServidor + "/vehiculos/CatalogoVehiculos"} element={<CatalogoVehiculos />} />
-        <Route path={rutaServidor + "/vehiculos/MantenimientoVehiculos"} element={<PantallaVehiculo />} />
-        <Route path={rutaServidor + "/cliente/CatalogoCliente"} element={<CatalogoClientes />} />
-        <Route path={rutaServidor + "/cliente/CrearCliente"} element={<CrearCliente />} />
-        <Route path={rutaServidor + "/zona/CatalogoZona"} element={<CatalogoZonas />} />
-        <Route path={rutaServidor + "/coordinador/CatalogoCoordinadores"} element={<CatalogoCoordinadores />} />
-        <Route path={rutaServidor + "/coordinador/MantenimientoCoordinador"} element={<PantallaCoordinador />} />
-        <Route path={rutaServidor + "/subDirector/CatalogoSubDirectores"} element={<CatalogoSubDirectores />} />
-        <Route path={rutaServidor + "/subDirector/MantenimientoSubDirector"} element={<PantallaSubDirector />} />
-        <Route path={rutaServidor + "/director/CatalogoDirectores"} element={<CatalogoDirectores />} />
-        <Route path={rutaServidor + "/director/MantenimientoDirector"} element={<PantallaDirector />} />
-        <Route path={rutaServidor + "/sucursales/CatalogoSucursales"} element={<CatalogoSucursales />} />
-        <Route path={rutaServidor + "/sucursales/CatalogoSucursales/horarios"} element={<TabsScreenSucursales />} />
-        <Route path={rutaServidor + "/operador/Operadores"} element={<PantallaOperador />} />
-        <Route path={rutaServidor + "/municipio/CatalogoMunicipio"} element={<CatalogoMunicipio />} />
-        <Route path={rutaServidor + "/municipio/CrearMunicipio"} element={<CrearMunicipio />} />
-        <Route path={rutaServidor + "/estado/CatalogoEstado"} element={<CatalogoEstado />} />
-        <Route path={rutaServidor + "/estado/CrearEstado"} element={<CrearEstado />} />
-        <Route path={rutaServidor + "/tipovehiculo/TipoVehiculos"} element={<PantallaTipoVehiculo />} />
-        <Route path={rutaServidor + "/tipovehiculo/crear"} element={<PantallaNuevoTipoVehiculo />} />
-        <Route path={rutaServidor + "/checkinout"} element={<StepChkInOut />} /> {/*<PantallaCheckInCheckOut />*/}
-        <Route path={rutaServidor + "/seguridad/PermisosRoles"} element={<PermisosRolesScreen />} />
-        <Route path={rutaServidor + "/seguridad/PermisosRolesCrear"} element={<NuevoPermisosRolesScreen />} />
-        <Route path={rutaServidor + "/seguridad/RolesUsuarios"} element={<RolesUsuariosScreen />} />
-        <Route path={rutaServidor + "/seguridad/RolesUsuariosCrear"} element={<NuevoRolesUsuariosScreen />} />
-        <Route path={rutaServidor + "/seguridad/RoleCrear"} element={<NuevoRolScreen />} />
-        <Route path={rutaServidor + "/planificacion/crear"} element={<PantallaNuevaPlanificacion />} />
-        <Route path={rutaServidor + "/planificacion/planificaciones"} element={<PantallaPlanificaciones />} />
-        <Route path={rutaServidor + "/productividad"} element={<PantallaProductividad />} />
-        <Route path={rutaServidor + "/productividad/detalleProductividad"} element={<PantallaDetalleProductividad />} />
-        <Route path={rutaServidor + "/productividad/registroIndividualProductividad"} element={<PantallaRegistroIndividualProductividad />} />
-        <Route path={rutaServidor + "/registroIndividualProductividad/ModalCrearEjecucionPlanificacion"} element={<ModalCrearEjecucionPlanificacion />} />        
-        <Route path={rutaServidor + "/nomina"} element={<PantallaNomina />} />
-        <Route path={rutaServidor + "/Nomina/Componentes/DetalleNomina"} element={<PantallaDetalleNomina />} />
-        <Route path={rutaServidor + "/Reportes/ReporteGasolina"} element={<PantallaReporteGasolinaOperador></PantallaReporteGasolinaOperador>}></Route>
-        <Route path={rutaServidor + "/Reportes/ReporteVehiculosExtra"} element={<PantallaReporteVehiculosExtra></PantallaReporteVehiculosExtra>}></Route>
-      </Routes>
-    </AppLayout>
-  );
+    return (
+        <AppLayout>
+            <Routes>
+                <Route path={rutaServidor + "/inicio"} element={<PantallaInicio />} />
+                <Route path={rutaServidor + "/operador/crear"} element={<PantallaNuevoOperador />} />
+                <Route path={rutaServidor + "/vehiculos/CatalogoVehiculos"} element={<CatalogoVehiculos />} />
+                <Route path={rutaServidor + "/vehiculos/MantenimientoVehiculos"} element={<PantallaVehiculo />} />
+                <Route path={rutaServidor + "/cliente/CatalogoCliente"} element={<CatalogoClientes />} />
+                <Route path={rutaServidor + "/cliente/CrearCliente"} element={<CrearCliente />} />
+                <Route path={rutaServidor + "/zona/CatalogoZona"} element={<CatalogoZonas />} />
+                <Route path={rutaServidor + "/coordinador/CatalogoCoordinadores"} element={<CatalogoCoordinadores />} />
+                <Route path={rutaServidor + "/coordinador/MantenimientoCoordinador"} element={<PantallaCoordinador />} />
+                <Route path={rutaServidor + "/subDirector/CatalogoSubDirectores"} element={<CatalogoSubDirectores />} />
+                <Route path={rutaServidor + "/subDirector/MantenimientoSubDirector"} element={<PantallaSubDirector />} />
+                <Route path={rutaServidor + "/director/CatalogoDirectores"} element={<CatalogoDirectores />} />
+                <Route path={rutaServidor + "/director/MantenimientoDirector"} element={<PantallaDirector />} />
+                <Route path={rutaServidor + "/sucursales/CatalogoSucursales"} element={<CatalogoSucursales />} />
+                <Route path={rutaServidor + "/sucursales/CatalogoSucursales/horarios"} element={<TabsScreenSucursales />} />
+                <Route path={rutaServidor + "/operador/Operadores"} element={<PantallaOperador />} />
+                <Route path={rutaServidor + "/municipio/CatalogoMunicipio"} element={<CatalogoMunicipio />} />
+                <Route path={rutaServidor + "/municipio/CrearMunicipio"} element={<CrearMunicipio />} />
+                <Route path={rutaServidor + "/estado/CatalogoEstado"} element={<CatalogoEstado />} />
+                <Route path={rutaServidor + "/estado/CrearEstado"} element={<CrearEstado />} />
+                <Route path={rutaServidor + "/tipovehiculo/TipoVehiculos"} element={<PantallaTipoVehiculo />} />
+                <Route path={rutaServidor + "/tipovehiculo/crear"} element={<PantallaNuevoTipoVehiculo />} />
+                <Route path={rutaServidor + "/checkinout"} element={<StepChkInOut />} /> {/*<PantallaCheckInCheckOut />*/}
+                <Route path={rutaServidor + "/seguridad/PermisosRoles"} element={<PermisosRolesScreen />} />
+                <Route path={rutaServidor + "/seguridad/PermisosRolesCrear"} element={<NuevoPermisosRolesScreen />} />
+                <Route path={rutaServidor + "/seguridad/RolesUsuarios"} element={<RolesUsuariosScreen />} />
+                <Route path={rutaServidor + "/seguridad/RolesUsuariosCrear"} element={<NuevoRolesUsuariosScreen />} />
+                <Route path={rutaServidor + "/seguridad/RoleCrear"} element={<NuevoRolScreen />} />
+                <Route path={rutaServidor + "/planificacion/crear"} element={<PantallaNuevaPlanificacion />} />
+                <Route path={rutaServidor + "/planificacion/planificaciones"} element={<PantallaPlanificaciones />} />
+                <Route path={rutaServidor + "/productividad"} element={<PantallaProductividad />} />
+                <Route path={rutaServidor + "/productividad/detalleProductividad"} element={<PantallaDetalleProductividad />} />
+                <Route path={rutaServidor + "/productividad/registroIndividualProductividad"} element={<PantallaRegistroIndividualProductividad />} />
+                <Route path={rutaServidor + "/registroIndividualProductividad/ModalCrearEjecucionPlanificacion"} element={<ModalCrearEjecucionPlanificacion />} />
+                <Route path={rutaServidor + "/nomina"} element={<PantallaNomina />} />
+                <Route path={rutaServidor + "/Nomina/Componentes/DetalleNomina"} element={<PantallaDetalleNomina />} />
+                <Route path={rutaServidor + "/Reportes/ReporteGasolina"} element={<PantallaReporteGasolinaOperador></PantallaReporteGasolinaOperador>}></Route>
+                <Route path={rutaServidor + "/Reportes/ReporteVehiculosExtra"} element={<PantallaReporteVehiculosExtra></PantallaReporteVehiculosExtra>}></Route>
+                <Route path={rutaServidor + "/Reportes/ReporteComparativoPagos"} element={<PantallaReporteComparativoPagos></PantallaReporteComparativoPagos>}></Route>
+            </Routes>
+        </AppLayout>
+    );
 };
