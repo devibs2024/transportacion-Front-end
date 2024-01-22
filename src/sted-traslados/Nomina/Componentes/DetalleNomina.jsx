@@ -258,31 +258,7 @@ export const PantallaDetalleNomina = () => {
     //### LISTADO
 
 
-    const cols = [
-        { field: 'IdOperador', header: 'Id Secuencia' },
-        { field: 'Operador', header: 'Operador' },
-        { field: 'Spot', header: 'Spot' },
-        { field: 'Banco', header: 'Banco' },
-        { field: 'Tarjeta', header: 'Tarjeta' },
-
-        { field: 'Dias', header: 'Dias' },
-
-        { field: 'Salario', header: 'Sueldo' },
-        { field: 'SubTotal1', header: 'SubTotal' },
-
-        { field: 'Descuento', header: 'Descuento' },
-        { field: 'Bono', header: 'Bono' },
-        { field: 'Gasolina', header: 'Gasolina' },
-        { field: 'SubTotal2', header: 'Subtotal' },
-
-        { field: 'SMG', header: 'SMG' },
-        { field: 'Total', header: 'Total' },
-
-        { field: 'STED', header: 'STED' },
-        { field: 'Pago', header: 'Pago' },
-    ];
-
-    const dt = useRef(null);
+    const customStyle = { backgroundColor: '#F2F2F2' };
 
 
     //####################################################################################################################################################
@@ -320,14 +296,39 @@ export const PantallaDetalleNomina = () => {
     //### LISTADO | EXPORTAR
 
 
-    const exportColumns = cols.map((col) => ({ title: col.header, datakey: col.field }));
-    const customStyle = { backgroundColor: '#F2F2F2' };
-
     //### LISTADO | EXPORTAR - CSV
+
+    const dt = useRef(null);
 
     const exportCSV = () => { dt.current.exportCSV(); };
 
     //### LISTADO | EXPORTAR - PDF
+
+    const cols = [
+        { field: 'IdOperador', header: 'Id Secuencia' },
+        { field: 'Operador', header: 'Operador' },
+        { field: 'Spot', header: 'Spot' },
+        { field: 'Banco', header: 'Banco' },
+        { field: 'Tarjeta', header: 'Tarjeta' },
+
+        { field: 'Dias', header: 'Dias' },
+
+        { field: 'Salario', header: 'Sueldo' },
+        { field: 'SubTotal1', header: 'SubTotal' },
+
+        { field: 'Descuento', header: 'Descuento' },
+        { field: 'Bono', header: 'Bono' },
+        { field: 'Gasolina', header: 'Gasolina' },
+        { field: 'SubTotal2', header: 'Subtotal' },
+
+        { field: 'SMG', header: 'SMG' },
+        { field: 'Total', header: 'Total' },
+
+        { field: 'STED', header: 'STED' },
+        { field: 'Pago', header: 'Pago' },
+    ];
+
+    const exportColumns = cols.map((col) => ({ title: col.header, datakey: col.field }));
 
     const exportPdf = () => {
         import('jspdf').then((jsPDF) => {

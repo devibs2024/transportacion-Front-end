@@ -16,6 +16,7 @@ import modeloReducer from './slices/modeloVehiculoSlice';
 import tiendaReducer from './slices/tiendaSlice';
 import empleadoCoordinadorReducer from './slices/empleadoCoordinadorSlice'
 import tiendaCoordinadorReducer from './slices/tiendaCoordinadorSlice'
+import clienteCoordinadorReducer from './slices/clienteCoordinadorSlice'
 
 const reducers = {
   operador: operadorReducer,
@@ -33,7 +34,8 @@ const reducers = {
   coordinador: coordinadorReducer,
   tienda: tiendaReducer,
   empleadoCoordinador: empleadoCoordinadorReducer,
-  tiendaCoordinador: tiendaCoordinadorReducer
+  tiendaCoordinador: tiendaCoordinadorReducer,
+  clienteCoordinador: clienteCoordinadorReducer
 };
 
 export const store = configureStore({
