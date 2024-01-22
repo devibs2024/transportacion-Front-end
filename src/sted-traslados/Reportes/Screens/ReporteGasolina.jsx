@@ -35,7 +35,7 @@ export const PantallaReporteGasolinaOperador = () => {
 
     const [error, setError] = useState(null);
 
-    const [registros, setRegistros] = useState([]);
+    const [registrosReporte, setRegistrosReporte] = useState([]);
 
     const idCoordinador = decodeToken.tokenDecode();
 
@@ -63,8 +63,8 @@ export const PantallaReporteGasolinaOperador = () => {
                 idCoordinador: idCoordinador,
                 idOperador: isNaN(values.idOperador) ? 0 : values.idOperador,
                 idTienda: isNaN(values.idTienda) ? 0 : values.idTienda,
-                fechaIni: strFecha(values.fechaDesde),
-                fechaEnd: strFecha(values.fechaHasta)
+                fechaIni: strFecha(new Date(values.fechaDesde)),
+                fechaEnd: strFecha(new Date(values.fechaHasta))
             }
 
             getReporte(filtros)
@@ -85,6 +85,7 @@ export const PantallaReporteGasolinaOperador = () => {
     //####################################################################################################################################################
     //### FUNCIONES
 
+    const strMoneda = new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", minimumFractionDigits: 2, });
 
     const strFecha = (date) => {
         const year = date.getFullYear();
@@ -93,6 +94,12 @@ export const PantallaReporteGasolinaOperador = () => {
         return `${year}-${month}-${day}`;
     };
 
+    const strFechaList = (date) => {
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        return `${month}/${day}/${year}`;
+    };
 
     //####################################################################################################################################################
     //### API
@@ -102,12 +109,12 @@ export const PantallaReporteGasolinaOperador = () => {
 
         try {
 
-            setRegistros([])
+            setRegistrosReporte([])
 
             const response = await API.get(`Reporte/Gasolina/${pFiltros.fechaIni},${pFiltros.fechaEnd},${Number(pFiltros.idCoordinador)},${Number(pFiltros.idOperador)},${Number(pFiltros.idTienda)}`);
 
             if (response.status == 200 || response.status == 204) {
-                setRegistros(response.data);
+                setRegistrosReporte(response.data);
             }
 
         }
@@ -133,6 +140,7 @@ export const PantallaReporteGasolinaOperador = () => {
     const operadoresOptions = useGetEmpleadoCoordinadores(idCoordinador).map((list) => ({ value: list.idOperador, label: list.nombres }));
     const tiendasOptions = useGetTiendaCoordinadores(idCoordinador).map((list) => ({ value: list.idTienda, label: list.nombreTienda }));
     
+
     //####################################################################################################################################################
     //### LISTADO
 
@@ -184,8 +192,11 @@ export const PantallaReporteGasolinaOperador = () => {
     //### LISTADO | EXPORTAR - PDF
 
     const cols = [
-        { field: 'nombreTienda', header: 'Sucursal' },
-        { field: 'nombreOperador', header: 'Operador' }
+        { field: 'Tienda', header: 'Sucursal' },
+        { field: 'Operador', header: 'Operador' },
+        { field: 'Tarjeta', header: 'Tarjeta' },
+        { field: 'Importe', header: 'Importe' },
+        { field: 'FechaDispersion', header: 'FechaDispersion' }
     ]
 
     const exportColumns = cols.map((col) => ({ title: col.header, datakey: col.field }));
@@ -194,7 +205,7 @@ export const PantallaReporteGasolinaOperador = () => {
         import('jspdf').then((jsPDF) => {
             import('jspdf-autotable').then(() => {
                 const doc = new jsPDF.default(0, 0);
-                doc.autoTable(exportColumns, registros);
+                doc.autoTable(exportColumns, registrosReporte);
                 doc.save('Nomina.pdf');
             });
         });
@@ -204,7 +215,7 @@ export const PantallaReporteGasolinaOperador = () => {
 
     const exportExcel = () => {
         import('xlsx').then((xlsx) => {
-            const worksheet = xlsx.utils.json_to_sheet(registros);
+            const worksheet = xlsx.utils.json_to_sheet(registrosReporte);
             const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
             const excelBuffer = xlsx.write(workbook, {
                 bookType: 'xlsx',
@@ -394,9 +405,7 @@ export const PantallaReporteGasolinaOperador = () => {
 
     const header = renderHeader();
 
-
     //### PANTALLA | LISTADO | BODY
-
 
     return (
         <div className='mt-5'>
@@ -410,16 +419,29 @@ export const PantallaReporteGasolinaOperador = () => {
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} rows"
                         ref={dt}
                         style={customStyle}
-                        value={registros}
+                        value={registrosReporte}
                         datakey="Row"
                         filters={filters}
                         filterDisplay="row"
-                        globalFilterFields={['nombreTienda', 'nombreOperador']}
+                        globalFilterFields={['tienda', 'operador']}
                         header={header}
                         emptyMessage="No data found.">
-                        <Column field='nombreTienda' header="Tienda" filter filterPlaceholder='Buscar por sucursal' style={{ minWidth: '12rem' }}></Column>
-                        <Column field='nombreOperador' header="Operador" filter filterPlaceholder='Buscar por operador' style={{ minWidth: '12rem' }}></Column>
-                        <Column field='numTarjeta' header="Numero de Tarjeta" style={{ minWidth: '12rem' }}></Column>
+                        <Column field='tienda' header="Sucursal" filter filterPlaceholder='Buscar por sucursal' style={{ minWidth: '12rem' }}></Column>
+                        <Column field='operador' header="Operador" filter filterPlaceholder='Buscar por operador' style={{ minWidth: '12rem' }}></Column>
+                        <Column field='tarjeta' header="Numero de Tarjeta" style={{ minWidth: '12rem' }}></Column>
+                        <Column 
+                            field='importe' 
+                            header="Importe" 
+                            style={{ minWidth: '12rem' }}
+                            body={(rowData) =>  strMoneda.format(rowData.importe)}
+                        >
+                        </Column>
+                        <Column 
+                            field='fechaDispersion' 
+                            header="Fecha Dispersión" 
+                            style={{ minWidth: '12rem' }}
+                            body={(rowData) => strFechaList(new Date( rowData.fechaDispersion))}
+                        ></Column>
                     </DataTable>
                 </div>
             </CustomCard>

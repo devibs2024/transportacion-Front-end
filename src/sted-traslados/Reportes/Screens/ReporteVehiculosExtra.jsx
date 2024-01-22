@@ -86,12 +86,22 @@ export const PantallaReporteVehiculosExtra = () => {
     //### FUNCIONES
 
 
+    const strMoneda = new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", minimumFractionDigits: 2, });
+
     const strFecha = (date) => {
         const year = date.getFullYear();
         const month = (date.getMonth() + 1).toString().padStart(2, '0');
         const day = date.getDate().toString().padStart(2, '0');
         return `${year}-${month}-${day}`;
     };
+
+    const strFechaList = (date) => {
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        return `${month}/${day}/${year}`;
+    };
+
 
     //####################################################################################################################################################
     //### API
@@ -415,7 +425,6 @@ export const PantallaReporteVehiculosExtra = () => {
     };
 
     const header = renderHeader();
-
 
     //### PANTALLA | LISTADO | BODY
 
