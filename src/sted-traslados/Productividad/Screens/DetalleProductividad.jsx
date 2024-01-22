@@ -85,7 +85,7 @@ export const PantallaDetalleProductividad = () => {
             if (response.status == 200 || response.status == 204) {
               
                 const dataWithDayOptions = response.data.map(item => {
-
+                    
                     // Primero, ordena lstDias de menor a mayor
                     const sortedDias = item.lstDias.sort((a, b) => a.nroDia - b.nroDia);
 

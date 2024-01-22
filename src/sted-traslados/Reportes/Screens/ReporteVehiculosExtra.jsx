@@ -35,7 +35,7 @@ export const PantallaReporteVehiculosExtra = () => {
 
     const [error, setError] = useState(null);
 
-    const [registros, setRegistros] = useState([]);
+    const [registrosReporte, setRegistrosReporte] = useState([]);
 
     const idCoordinador = decodeToken.tokenDecode();
 
@@ -110,12 +110,12 @@ export const PantallaReporteVehiculosExtra = () => {
 
         try {
 
-            setRegistros([])
+            setRegistrosReporte([])
 
             const response = await API.get(`Reporte/VehiculosExtra/${pFiltros.fechaIni},${pFiltros.fechaEnd},${Number(pFiltros.idCoordinador)},${Number(pFiltros.idCliente)},${Number(pFiltros.idTienda)},${Number(pFiltros.idTipoVehiculo)}`);
 
             if (response.status == 200 || response.status == 204) {
-                setRegistros(response.data);
+                setRegistrosReporte(response.data);
             }
 
         }
@@ -192,8 +192,9 @@ export const PantallaReporteVehiculosExtra = () => {
     //### LISTADO | EXPORTAR - PDF
 
     const cols = [
-        { field: 'nombreTienda', header: 'Sucursal' },
-        { field: 'nombreOperador', header: 'Operador' }
+        { field: 'cliente', header: 'Sucursal' },
+        { field: 'tienda', header: 'Sucursal' },
+        { field: 'tipoVehiculo', header: 'TipoVehiculo' }
     ]
 
     const exportColumns = cols.map((col) => ({ title: col.header, datakey: col.field }));
@@ -202,7 +203,7 @@ export const PantallaReporteVehiculosExtra = () => {
         import('jspdf').then((jsPDF) => {
             import('jspdf-autotable').then(() => {
                 const doc = new jsPDF.default(0, 0);
-                doc.autoTable(exportColumns, registros);
+                doc.autoTable(exportColumns, registrosReporte);
                 doc.save('Nomina.pdf');
             });
         });
@@ -212,7 +213,7 @@ export const PantallaReporteVehiculosExtra = () => {
 
     const exportExcel = () => {
         import('xlsx').then((xlsx) => {
-            const worksheet = xlsx.utils.json_to_sheet(registros);
+            const worksheet = xlsx.utils.json_to_sheet(registrosReporte);
             const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
             const excelBuffer = xlsx.write(workbook, {
                 bookType: 'xlsx',
@@ -433,21 +434,129 @@ export const PantallaReporteVehiculosExtra = () => {
             <CustomCard title="Reporte de Vehículos Extra">
                 <div className='card'>
                     <Toolbar className='mb-4' left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
-                    <DataTable paginator rows={5} rowsPerPageOptions={[5, 10, 25]}
+                    <DataTable
+                        paginator rows={5}
+                        rowsPerPageOptions={[5, 10, 25]}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} rows"
                         ref={dt}
                         style={customStyle}
-                        value={registros}
+                        value={registrosReporte}
                         datakey="idCliente"
                         filters={filters}
                         filterDisplay="row"
-                        globalFilterFields={['nombreCliente', 'clave']}
+                        globalFilterFields={['cliente', 'tienda', 'tipoVehiculo']}
                         header={header}
-                        emptyMessage="No data found.">
-                        <Column field='nombreCliente' header='Cliente' filter filterPlaceholder="Buscar por cliente" style={{ minWidth: '12rem' }}></Column>
-                        <Column field='nombreTienda' header='Sucursal' filter filterPlaceholder="Buscar por Sucursal" style={{ minWidth: '12rem' }}></Column>
-                        <Column field='nombreTipoVehiculo' header='Tipo Vehículo' filter filterPlaceholder="Buscar por tipo de vehículo" style={{ minWidth: '12rem' }}></Column>
+                        emptyMessage="No data found."
+                    >
+                        <Column field='cliente' header='Cliente' filter filterPlaceholder="Buscar por cliente" style={{ minWidth: '12rem' }}></Column>
+                        <Column field='tienda' header='Sucursal' filter filterPlaceholder="Buscar por Sucursal" style={{ minWidth: '12rem' }}></Column>
+                        <Column field='tipoVehiculo' header='Tipo Vehículo' filter filterPlaceholder="Buscar por tipo de vehículo" style={{ minWidth: '12rem' }}></Column>
+                        <Column field='unidadesSpot' header='Unidades Spot' style={{ minWidth: '12rem', textAlign: 'center' }}></Column>
+                        <Column style={{ minWidth: '32rem' }}
+                            header="Unidades Solicitadas"
+                            body=
+                            {
+                                (rowData) => {
+                                    return (
+                                        <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                                            {
+                                                rowData.listDias.map
+                                                    (
+                                                        (option, index) => {
+                                                            return (
+                                                                <div
+                                                                    key={index}
+                                                                    style={{
+                                                                        padding: '5px',
+                                                                        fontWeight: 'regular',
+                                                                        textAlign: 'center',
+                                                                        width: '50px',
+                                                                        border: '1px solid'
+                                                                    }}
+                                                                >
+                                                                    {option.sol}
+                                                                </div>
+                                                            );
+                                                        }
+                                                    )
+                                            }
+                                        </div>
+                                    );
+                                }
+                            }
+                            autoWidth
+                        />
+                        <Column field='totalUnidadesSolicitadas' header='Total Utilizadas' style={{ minWidth: '12rem', textAlign: 'center' }}></Column>
+                        <Column style={{ minWidth: '32rem' }}
+                            header="Unidades Spot"
+                            body=
+                            {
+                                (rowData) => {
+                                    return (
+                                        <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                                            {
+                                                rowData.listDias.map
+                                                    (
+                                                        (option, index) => {
+                                                            return (
+                                                                <div
+                                                                    key={index}
+                                                                    style={{
+                                                                        padding: '5px',
+                                                                        fontWeight: 'regular',
+                                                                        textAlign: 'center',
+                                                                        width: '50px',
+                                                                        border: '1px solid'
+                                                                    }}
+                                                                >
+                                                                    {option.spot}
+                                                                </div>
+                                                            );
+                                                        }
+                                                    )
+                                            }
+                                        </div>
+                                    );
+                                }}
+                            autoWidth
+                        />
+                        <Column field='totalUnidadesSpot' header='Total Unidades Spot' style={{ minWidth: '12rem', textAlign: 'center' }}></Column>
+                        <Column style={{ minWidth: '32rem' }}
+                            header="Unidades Totales"
+                            body=
+                            {
+                                (rowData) => {
+                                    return (
+                                        <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                                            {
+                                                rowData.listDias.map
+                                                    (
+                                                        (option, index) => {
+                                                            return (
+                                                                <div
+                                                                    key={index}
+                                                                    style={{
+                                                                        padding: '5px',
+                                                                        fontWeight: 'regular',
+                                                                        textAlign: 'center',
+                                                                        width: '50px',
+                                                                        border: '1px solid'
+                                                                    }}
+                                                                >
+                                                                    {option.tot}
+                                                                </div>
+                                                            );
+                                                        }
+                                                    )
+                                            }
+                                        </div>
+                                    );
+                                }}
+                            autoWidth
+                        />
+                        <Column field='totalUnidades' header='Total Unidades Utilizadas' style={{ minWidth: '12rem', textAlign: 'center' }}></Column>
+                        <Column field='totalUnidadesGeneral' header='Total General' style={{ minWidth: '12rem', textAlign: 'center' }}></Column>
                     </DataTable>
                 </div>
             </CustomCard>
