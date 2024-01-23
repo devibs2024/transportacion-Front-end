@@ -155,8 +155,9 @@ export const PantallaReporteComparativoPagos = () => {
 
     const [filters, setFilters] = useState({
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        nombreTienda: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        NombreOperador: { value: null, matchMode: FilterMatchMode.STARTS_WITH }
+        tienda: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        operador: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        tipoVehiculo: { value: null, matchMode: FilterMatchMode.STARTS_WITH }
     });
 
     const onGlobalFilterChange = (e) => {
@@ -169,8 +170,9 @@ export const PantallaReporteComparativoPagos = () => {
     const initFilters = () => {
         setFilters({
             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-            nombreTienda: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-            NombreOperador: { value: null, matchMode: FilterMatchMode.STARTS_WITH }
+            tienda: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+            operador: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+            tipoVehiculo: { value: null, matchMode: FilterMatchMode.STARTS_WITH }
         });
         setGlobalFilterValue('')
     };

@@ -157,8 +157,8 @@ export const PantallaReporteGasolinaOperador = () => {
 
     const [filters, setFilters] = useState({
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        nombreTienda: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        NombreOperador: { value: null, matchMode: FilterMatchMode.STARTS_WITH }
+        tienda: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        operador: { value: null, matchMode: FilterMatchMode.STARTS_WITH }
     });
 
     const onGlobalFilterChange = (e) => {
@@ -171,8 +171,8 @@ export const PantallaReporteGasolinaOperador = () => {
     const initFilters = () => {
         setFilters({
             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-            nombreTienda: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-            NombreOperador: { value: null, matchMode: FilterMatchMode.STARTS_WITH }
+            tienda: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        operador: { value: null, matchMode: FilterMatchMode.STARTS_WITH }
         });
         setGlobalFilterValue('')
     };
@@ -192,11 +192,11 @@ export const PantallaReporteGasolinaOperador = () => {
     //### LISTADO | EXPORTAR - PDF
 
     const cols = [
-        { field: 'Tienda', header: 'Sucursal' },
-        { field: 'Operador', header: 'Operador' },
-        { field: 'Tarjeta', header: 'Tarjeta' },
-        { field: 'Importe', header: 'Importe' },
-        { field: 'FechaDispersion', header: 'FechaDispersion' }
+        { field: 'tienda', header: 'Sucursal' },
+        { field: 'operador', header: 'Operador' },
+        { field: 'tarjeta', header: 'Tarjeta' },
+        { field: 'importe', header: 'Importe' },
+        { field: 'fechaDispersion', header: 'FechaDispersion' }
     ]
 
     const exportColumns = cols.map((col) => ({ title: col.header, datakey: col.field }));
