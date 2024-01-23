@@ -215,13 +215,21 @@ export const PantallaReporteVehiculosExtra = () => {
 
     const exportExcel = () => {
         import('xlsx').then((xlsx) => {
-            const worksheet = xlsx.utils.json_to_sheet(registrosReporte);
-            const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
-            const excelBuffer = xlsx.write(workbook, {
-                bookType: 'xlsx',
-                type: 'array'
-            });
-            saveAsExcelFile(excelBuffer, 'Nómina');
+
+            var dtDataVis = document.getElementById("dtData");
+            var workbook = xlsx.utils.table_to_book(dtDataVis);
+            var ws = workbook.Sheets["Vehiculos Extra"];
+            const excelBuffer = xlsx.write(workbook, { bookType: 'xlsx', type: 'array' });
+            saveAsExcelFile(excelBuffer, 'VehiculosExtra');
+
+            // const worksheet = xlsx.utils.json_to_sheet(registrosReporte);
+            // const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
+            // const excelBuffer = xlsx.write(workbook, {
+            //     bookType: 'xlsx',
+            //     type: 'array'
+            // });
+            // saveAsExcelFile(excelBuffer, 'Nómina');
+
         });
     };
 
@@ -437,6 +445,7 @@ export const PantallaReporteVehiculosExtra = () => {
                 <div className='card'>
                     <Toolbar className='mb-4' left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
                     <DataTable
+                        id="dtData"
                         paginator rows={5}
                         rowsPerPageOptions={[5, 10, 25]}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"

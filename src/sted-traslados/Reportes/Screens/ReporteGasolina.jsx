@@ -139,7 +139,7 @@ export const PantallaReporteGasolinaOperador = () => {
 
     const operadoresOptions = useGetEmpleadoCoordinadores(idCoordinador).map((list) => ({ value: list.idOperador, label: list.nombres }));
     const tiendasOptions = useGetTiendaCoordinadores(idCoordinador).map((list) => ({ value: list.idTienda, label: list.nombreTienda }));
-    
+
 
     //####################################################################################################################################################
     //### LISTADO
@@ -172,7 +172,7 @@ export const PantallaReporteGasolinaOperador = () => {
         setFilters({
             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
             tienda: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        operador: { value: null, matchMode: FilterMatchMode.STARTS_WITH }
+            operador: { value: null, matchMode: FilterMatchMode.STARTS_WITH }
         });
         setGlobalFilterValue('')
     };
@@ -215,13 +215,21 @@ export const PantallaReporteGasolinaOperador = () => {
 
     const exportExcel = () => {
         import('xlsx').then((xlsx) => {
-            const worksheet = xlsx.utils.json_to_sheet(registrosReporte);
-            const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
-            const excelBuffer = xlsx.write(workbook, {
-                bookType: 'xlsx',
-                type: 'array'
-            });
-            saveAsExcelFile(excelBuffer, 'Nómina');
+
+            var dtDataVis = document.getElementById("dtData");
+            var workbook = xlsx.utils.table_to_book(dtDataVis);
+            var ws = workbook.Sheets["Consumo de Gasolina"];
+            const excelBuffer = xlsx.write(workbook, { bookType: 'xlsx', type: 'array' });
+            saveAsExcelFile(excelBuffer, 'ConsumoGasolina');
+
+            // const worksheet = xlsx.utils.json_to_sheet(registrosReporte);
+            // const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
+            // const excelBuffer = xlsx.write(workbook, {
+            //     bookType: 'xlsx',
+            //     type: 'array'
+            // });
+            // saveAsExcelFile(excelBuffer, 'Nómina');
+
         });
     };
 
@@ -413,6 +421,7 @@ export const PantallaReporteGasolinaOperador = () => {
                 <div className='card'>
                     <Toolbar className='mb-4' left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
                     <DataTable
+                        id="dtData"
                         paginator rows={5}
                         rowsPerPageOptions={[5, 10, 25]}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
@@ -429,18 +438,18 @@ export const PantallaReporteGasolinaOperador = () => {
                         <Column field='tienda' header="Sucursal" filter filterPlaceholder='Buscar por sucursal' style={{ minWidth: '12rem' }}></Column>
                         <Column field='operador' header="Operador" filter filterPlaceholder='Buscar por operador' style={{ minWidth: '12rem' }}></Column>
                         <Column field='tarjeta' header="Numero de Tarjeta" style={{ minWidth: '12rem' }}></Column>
-                        <Column 
-                            field='importe' 
-                            header="Importe" 
+                        <Column
+                            field='importe'
+                            header="Importe"
                             style={{ minWidth: '12rem', textAlign: 'right' }}
-                            body={(rowData) =>  strMoneda.format(rowData.importe)}
+                            body={(rowData) => strMoneda.format(rowData.importe)}
                         >
                         </Column>
-                        <Column 
-                            field='fechaDispersion' 
-                            header="Fecha Dispersión" 
+                        <Column
+                            field='fechaDispersion'
+                            header="Fecha Dispersión"
                             style={{ minWidth: '12rem', textAlign: 'center' }}
-                            body={(rowData) => strFechaList(new Date( rowData.fechaDispersion))}
+                            body={(rowData) => strFechaList(new Date(rowData.fechaDispersion))}
                         ></Column>
                     </DataTable>
                 </div>
