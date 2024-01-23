@@ -110,7 +110,7 @@ export const PantallaReporteComparativoPagos = () => {
 
             setRegistrosReporte([])
 
-            const response = await API.get(`Reporte/VehiculosExtra/${pFiltros.fechaIni},${pFiltros.fechaEnd},${Number(pFiltros.idCoordinador)},${Number(pFiltros.idCliente)},${Number(pFiltros.idTienda)},${Number(pFiltros.idTipoVehiculo)}`);
+            const response = await API.get(`Reporte/ComparativoPagos/${pFiltros.fechaIni},${pFiltros.fechaEnd},${Number(pFiltros.idCoordinador)},${Number(pFiltros.idTienda)},${Number(pFiltros.idTipoVehiculo)}`);
 
             if (response.status == 200 || response.status == 204) {
                 setRegistrosReporte(response.data);
@@ -404,7 +404,7 @@ export const PantallaReporteComparativoPagos = () => {
 
     return (
         <div className='mt-5'>
-            <CustomCard title="Reporte de Vehículos Extra">
+            <CustomCard title="Reporte Comparativo de Pagos Sted">
                 <div className='card'>
                     <Toolbar className='mb-4' left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
                     <DataTable
@@ -418,13 +418,95 @@ export const PantallaReporteComparativoPagos = () => {
                         datakey="idCliente"
                         filters={filters}
                         filterDisplay="row"
-                        globalFilterFields={['cliente', 'tienda', 'tipoVehiculo']}
+                        globalFilterFields={['operador', 'tienda', 'tipoVehiculo']}
                         header={header}
                         emptyMessage="No data found."
                     >
-                        <Column field='cliente' header='Cliente' filter filterPlaceholder="Buscar por cliente" style={{ minWidth: '12rem' }}></Column>
-                        <Column field='tienda' header='Sucursal' filter filterPlaceholder="Buscar por Sucursal" style={{ minWidth: '12rem' }}></Column>
+                        <Column field='operador' header='Operador' filter filterPlaceholder="Buscar por Operador" style={{ minWidth: '12rem' }}></Column>
                         <Column field='tipoVehiculo' header='Tipo Vehículo' filter filterPlaceholder="Buscar por tipo de vehículo" style={{ minWidth: '12rem' }}></Column>
+                        <Column field='tienda' header='Sucursal' filter filterPlaceholder="Buscar por Sucursal" style={{ minWidth: '12rem' }}></Column>
+                        <Column field='estado' header='Estado' style={{ minWidth: '12rem' }}></Column>
+                        <Column field='zonaSted' header='Zona' style={{ minWidth: '12rem' }}></Column>
+                        <Column field='cliente' header='Cliente' style={{ minWidth: '12rem' }}></Column>
+
+                        <Column field='noUnidades' header='No. Unidades' style={{ minWidth: '12rem', textAlign: 'center' }}></Column>
+                        <Column field='dias' header='Dias' style={{ minWidth: '12rem', textAlign: 'center' }}></Column>
+
+                        <Column
+                            field='tarifaCliente'
+                            header="Tarifa Cliente"
+                            style={{ minWidth: '12rem', textAlign: 'right' }}
+                            body={(rowData) => strMoneda.format(rowData.tarifaCliente)}
+                        />
+                        <Column
+                            field='tarifaAyudante'
+                            header="Tarifa Ayudante"
+                            style={{ minWidth: '12rem', textAlign: 'right' }}
+                            body={(rowData) => strMoneda.format(rowData.tarifaAyudante)}
+                        />
+                        <Column
+                            field='tarifaHoraExtra'
+                            header="Tarifa Hora Extra"
+                            style={{ minWidth: '12rem', textAlign: 'right' }}
+                            body={(rowData) => strMoneda.format(rowData.tarifaHoraExtra)}
+                        />
+
+                        <Column field='unidadesSpot' header='Unidades Spot' style={{ minWidth: '12rem', textAlign: 'center' }}></Column>
+                        <Column
+                            field='tarifaSpot'
+                            header="Tarifa Spot"
+                            style={{ minWidth: '12rem', textAlign: 'right' }}
+                            body={(rowData) => strMoneda.format(rowData.tarifaSpot)}
+                        />
+
+                        <Column
+                            field='totalCliente'
+                            header="Tarifa Cobro Cliente"
+                            style={{ minWidth: '12rem', textAlign: 'right' }}
+                            body={(rowData) => strMoneda.format(rowData.totalCliente)}
+                        />
+
+                        <Column
+                            field='tarifaVehiculo'
+                            header="Tarifa Vehículo"
+                            style={{ minWidth: '12rem', textAlign: 'right' }}
+                            body={(rowData) => strMoneda.format(rowData.tarifaVehiculo)}
+                        />
+
+                        <Column
+                            field='salario'
+                            header="Salario"
+                            style={{ minWidth: '12rem', textAlign: 'right' }}
+                            body={(rowData) => strMoneda.format(rowData.salario)}
+                        />
+
+                        <Column
+                            field='gasolina'
+                            header="Gasolina"
+                            style={{ minWidth: '12rem', textAlign: 'right' }}
+                            body={(rowData) => strMoneda.format(rowData.gasolina)}
+                        />
+                        <Column
+                            field='descuentoSted'
+                            header="Descuento Sted"
+                            style={{ minWidth: '12rem', textAlign: 'right' }}
+                            body={(rowData) => strMoneda.format(rowData.descuentoSted)}
+                        />
+
+                        <Column
+                            field='total'
+                            header="Total"
+                            style={{ minWidth: '12rem', textAlign: 'right' }}
+                            body={(rowData) => strMoneda.format(rowData.total)}
+                        />
+
+                        <Column
+                            field='totalGeneral'
+                            header="Total Semanal"
+                            style={{ minWidth: '12rem', textAlign: 'right' }}
+                            body={(rowData) => strMoneda.format(rowData.totalGeneral)}
+                        />
+
                     </DataTable>
                 </div>
             </CustomCard>
