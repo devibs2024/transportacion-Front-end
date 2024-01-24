@@ -15,6 +15,7 @@ import Row from 'react-bootstrap/Row';
 import { Calendar } from 'primereact/calendar';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { Input } from "@mui/material";
 
 import { accionExitosa, accionFallida } from '../../../shared/Utils/modals';
 
@@ -76,9 +77,9 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, productividad,
                 horaF: 0,
                 minutoF: 0,
                 descanso: formik.values.descanso,
-                incentivoFactura: 0,
+                incentivoFactura: formik.values.incentivoFactura,
                 descuentoTardanza: 0,
-                montoHorasExtras: 0,
+                montoHorasExtras: formik.values.montoHorasExtras,
                 justificacion: '',
                 idVehiculo: formik.values.idVehiculo,
             };
@@ -362,6 +363,43 @@ export const ModalCrearEjecucionPlanificacion = ({ show, setShow, productividad,
                             </Col>
 
                         </Row>
+
+                        <Row>
+
+<Col>
+
+<Form.Group controlId="incentivoFactura">
+                                    <Form.Label>Incentivo Factura:</Form.Label>
+                                    <br />
+                                    <Input
+                                        id="incentivoFactura"
+                                        inputId="incentivoFactura"
+                                        onChange={(e) => formik.setFieldValue('incentivoFactura', e.target.value)}
+                                        value={formik.values.incentivoFactura}
+                                    />
+                                    {formik.touched.incentivoFactura && formik.errors.incentivoFactura ? (<Form.Text className="text-danger">{formik.errors.incentivoFactura}</Form.Text>) : null}
+                                </Form.Group>
+
+
+</Col>
+
+<Col>
+
+<Form.Group controlId="montoHorasExtras">
+                                    <Form.Label>Monto Horas Extras:</Form.Label>
+                                    <br />
+                                    <Input
+                                        id="montoHorasExtras"
+                                        inputId="montoHorasExtras"
+                                        onChange={(e) => formik.setFieldValue('montoHorasExtras', e.target.value)}
+                                        value={formik.values.montoHorasExtras}
+                                    />
+                                    {formik.touched.montoHorasExtras && formik.errors.montoHorasExtras ? (<Form.Text className="text-danger">{formik.errors.montoHorasExtras}</Form.Text>) : null}
+                                </Form.Group>
+
+</Col>
+
+</Row>
 
                         <Row>
 

@@ -16,6 +16,7 @@ import { FilterMatchMode } from 'primereact/api';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
+import { Input } from "@mui/material";
 import { Button } from 'primereact/button';
 import { Calendar } from 'primereact/calendar';
 import { Dropdown } from 'primereact/dropdown';
@@ -353,6 +354,63 @@ export const PantallaRegistroIndividualProductividad = () => {
 
     };
 
+    const onTextIFChange = (e, rowData) => {
+
+        rowData.incentivoFactura = e.target.value;
+
+        let updatedProductividades = [...ejecuciones];
+        let index = updatedProductividades.findIndex(data => data.idEjecucionPlanificacion === rowData.idEjecucionPlanificacion);
+        updatedProductividades[index].incentivoFactura = e.target.value;
+        setEjecuciones(updatedProductividades);
+
+        setChangedCells(prev => {
+
+            const index = prev.findIndex(el => el.idEjecucionPlanificacion === rowData.idEjecucionPlanificacion);
+
+            if (index !== -1) {
+                return [
+                    ...prev.slice(0, index),
+                    rowData,
+                    ...prev.slice(index + 1)
+                ];
+            }
+            else {
+                return [...prev, rowData];
+            }
+        });
+
+
+    };
+
+    const onTextMHEChange = (e, rowData) => {
+
+
+        rowData.montoHorasExtras = e.target.value;
+
+        let updatedProductividades = [...ejecuciones];
+        let index = updatedProductividades.findIndex(data => data.idEjecucionPlanificacion === rowData.idEjecucionPlanificacion);
+        updatedProductividades[index].montoHorasExtras = e.target.value;
+        setEjecuciones(updatedProductividades);
+
+        setChangedCells(prev => {
+
+            const index = prev.findIndex(el => el.idEjecucionPlanificacion === rowData.idEjecucionPlanificacion);
+
+            if (index !== -1) {
+                return [
+                    ...prev.slice(0, index),
+                    rowData,
+                    ...prev.slice(index + 1)
+                ];
+            }
+            else {
+                return [...prev, rowData];
+            }
+        });
+
+
+    };
+
     const isCellChanged = (id) => {
 
         return changedCells.find(cell => cell.id === id)?.changed;
@@ -395,9 +453,36 @@ export const PantallaRegistroIndividualProductividad = () => {
 
     const renderListVehiculos = (props) => {
         return (
-            <Dropdown id={props.rowData.idDetallePlanificacion} value={props.rowData.idVehiculo} options={operadorVehiculosOptions} onChange={(e) => onListVehiculosChange(e, props.rowData)} placeholder="Selecciona un Vehículo" />
+            <Dropdown
+                id={props.rowData.idDetallePlanificacion}
+                value={props.rowData.idVehiculo}
+                options={operadorVehiculosOptions}
+                onChange={(e) => onListVehiculosChange(e, props.rowData)}
+                placeholder="Selecciona un Vehículo" />
         );
     };
+
+    const renderTextIF = (props) => {
+        return (
+            <Input
+                id={props.rowData.idDetallePlanificacion}
+                value={props.rowData.incentivoFactura}
+                onChange={(e) => onTextIFChange(e, props.rowData)}
+                placeholder="Ingrese el incentivo factura" />
+        );
+    };
+
+    const renderTextMHE = (props) => {
+        return (
+            <Input
+                id={props.rowData.idDetallePlanificacion}
+                inputId={props.rowData.idDetallePlanificacion}
+                value={props.rowData.montoHorasExtras}
+                onChange={(e) => onTextMHEChange(e, props.rowData)}
+                placeholder="Ingrese el incentivo factura" />
+        );
+    };
+
 
     //####################################################################################################################################################
     //### LISTADO | FILTROS
@@ -574,8 +659,6 @@ export const PantallaRegistroIndividualProductividad = () => {
                             field="fecha"
                             header="Fecha"
                             body={(rowData) => rowData.fecha.substring(0, 10)}
-                            filter
-                            filterPlaceholder="Buscar por fecha"
                             style={{ minWidth: '12rem' }}
                         />
 
@@ -593,8 +676,6 @@ export const PantallaRegistroIndividualProductividad = () => {
                             {
                                 (props) => renderStartTimeEditor(props)
                             }
-                            filter
-                            filterPlaceholder="Buscar por hora inicio"
                             style={{ minWidth: '12rem' }}
                         />
 
@@ -612,8 +693,6 @@ export const PantallaRegistroIndividualProductividad = () => {
                             {
                                 (props) => renderEndTimeEditor(props)
                             }
-                            filter
-                            filterPlaceholder="Buscar por hora fin"
                             style={{ minWidth: '12rem' }} />
 
                         <Column
@@ -630,8 +709,38 @@ export const PantallaRegistroIndividualProductividad = () => {
                             {
                                 (props) => renderListVehiculos(props)
                             }
-                            filter
-                            filterPlaceholder="Buscar por vehiculo"
+                            style={{ minWidth: '12rem' }} />
+
+                        <Column
+                            field="incentivoFactura"
+                            header="Incentivo Factura"
+                            body=
+                            {
+                                (rowData) =>
+                                    <div style={isCellChanged(rowData.idEjecucionPlanificacion + 'incentivoFactura') ? { border: '1px solid red' } : {}}>
+                                        {rowData.incentivoFactura}
+                                    </div>
+                            }
+                            editor=
+                            {
+                                (props) => renderTextIF(props)
+                            }
+                            style={{ minWidth: '12rem' }} />
+
+                        <Column
+                            field="montoHorasExtras"
+                            header="Monto Horas Extras"
+                            body=
+                            {
+                                (rowData) =>
+                                    <div style={isCellChanged(rowData.idEjecucionPlanificacion + 'montoHorasExtras') ? { border: '1px solid red' } : {}}>
+                                        {rowData.montoHorasExtras}
+                                    </div>
+                            }
+                            editor=
+                            {
+                                (props) => renderTextMHE(props)
+                            }
                             style={{ minWidth: '12rem' }} />
 
                         <Column
@@ -645,6 +754,7 @@ export const PantallaRegistroIndividualProductividad = () => {
                                     </div>
                             }
                         />
+
                     </DataTable>
                 </div>
             </CustomCard>
