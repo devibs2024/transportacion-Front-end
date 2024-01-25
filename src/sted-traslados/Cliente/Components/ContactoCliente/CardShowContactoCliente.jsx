@@ -33,7 +33,7 @@ export const CardShowContactoCliente = ({ cliente }) => {
   return (
     <div className="col col-sm-12">
       <Card>
-        <ModalContactoCliente cliente={cliente} getContactoCliente={getContactoCliente()} contactoClientes={contactoClientes} setContactoClientes={setContactoClientes} show={show} setShow={setShow} />
+        <ModalContactoCliente cliente={cliente} getContactoCliente={getContactoCliente} contactoClientes={contactoClientes} setContactoClientes={setContactoClientes} show={show} setShow={setShow} />
         <ModalGerenteSubGerente cliente={cliente} contactoClientes={contactoClientes} setContactoClientes={setContactoClientes} show1={show1} setShow1={setShow1} />
 
         <div className="d-flex mt-2 ms-3 me-3">

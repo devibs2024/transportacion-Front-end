@@ -7,11 +7,10 @@ export const CoordinadorTable = ({ coordinador, coordinadorClientes, setCoordina
 
 
     const handleShow = () => setShow(true);
+
     const eliminarCliente = async (cliente) => {
 
-console.log(cliente);
-
-
+        console.log(cliente);
 
         confirmarAccion({ titulo: 'Eliminar Cliente', mensaje: 'Estas seguro que deseas eliminar la cliente?' }).then(async (result) => {
             if (result.isConfirmed) {

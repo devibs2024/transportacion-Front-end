@@ -30,7 +30,7 @@ export const CardFormato = ({ cliente }) => {
     return (
         <div className="col col-sm-12">
             <Card >
-                <ModalCrearFormato cliente={cliente} getFormatoClientes={getFormatoClientes()} show={show} setShow={setShow} setFormatoClientes={setFormatoClientes} formatoClientes={formatoClientes} />
+                <ModalCrearFormato cliente={cliente} getFormatoClientes={getFormatoClientes} show={show} setShow={setShow} setFormatoClientes={setFormatoClientes} formatoClientes={formatoClientes} />
                 <div className="d-flex justify-content-start mt-2 ms-3 me-3">
                     <Button onClick={handleShow} variant="custom" className="me-3 mt-3">Agregar Nuevo Formato<i className="fa-solid fa-plus"></i></Button>
                 </div>

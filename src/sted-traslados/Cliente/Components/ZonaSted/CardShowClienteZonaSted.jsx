@@ -13,7 +13,7 @@ export const CardShowClienteZonaSted = ({ cliente, zonaSted, setZonaSted }) => {
 
     useEffect(() => {
         getZonaSteds();
-    }, [clienteZonaSteds])
+    }, [])
 
     const getZonaSteds = async () => {
 
@@ -27,7 +27,7 @@ export const CardShowClienteZonaSted = ({ cliente, zonaSted, setZonaSted }) => {
     return (
         <div className="col col-sm-12">
             <Card>
-                <ModalCrearClienteZonaSted zonaSted={zonaSted} getZonaSteds={getZonaSteds()} setZonaSted={setZonaSted} cliente={cliente} clienteZonaSteds={clienteZonaSteds} setClienteZonaSteds={setClienteZonaSteds} show={show} setShow={setShow} />
+                <ModalCrearClienteZonaSted zonaSted={zonaSted} getZonaSteds={getZonaSteds} setZonaSted={setZonaSted} cliente={cliente} clienteZonaSteds={clienteZonaSteds} setClienteZonaSteds={setClienteZonaSteds} show={show} setShow={setShow} />
                 <div className="d-flex justify-content-start mt-2 ms-3 me-3">
                     <Button onClick={handleShow} variant="custom" className="me-3 mt-3" >Agregar Nueva ZonaSted <i className="fa-solid fa-plus"></i></Button>
                 </div>
