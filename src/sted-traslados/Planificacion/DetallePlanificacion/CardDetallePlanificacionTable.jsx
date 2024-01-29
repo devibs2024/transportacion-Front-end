@@ -10,7 +10,6 @@ export const PlanificacionDetalleTable = ({
     planificacion, detallesGeneralesPlanificacion, setDetallesGeneralesPlanificacion, handleShow, detallePlanificacion, setDetallePlanificacion
 }) => {
 
-    console.log(planificacion)
     useEffect(() => {
         getPlanificacionDetalles();
     }, [])
@@ -37,7 +36,6 @@ export const PlanificacionDetalleTable = ({
         if (response.status == 200 || response.status == 204) {
             setDetallesGeneralesPlanificacion(response.data);
             setExpandedRows(response.data)
-            console.log(response.data)
         }
     };
 
@@ -163,6 +161,23 @@ export const PlanificacionDetalleTable = ({
         </div>
     );
 
+    
+
+    const onDelete = (rowData, tienda, operador) => {
+
+        deleteDetalle(planificacion.idPlanificacion, operador.idDetallePlanificacion)
+
+    }
+
+    const deleteDetalle = async (idPlanificacion, idDetallePlanificacion) => {
+
+        const response = await API.delete(`DetallePlanificaciones/${idPlanificacion},${idDetallePlanificacion}`);
+
+        if (response.status == 200 || response.status == 204) {
+          getPlanificacionDetalles();
+        }
+
+    };
 
     const updateDetallePlanificacion = (rowData, tienda, operador) => {
 
@@ -175,26 +190,17 @@ export const PlanificacionDetalleTable = ({
             horaFin: operador.horaFin,
         });
 
-        console.log({
-            idDetallePlanificacion: operador.idDetallePlanificacion,
-            idOperador: operador.idOperador,
-            idTienda: tienda.idTienda,
-            fecha: tienda.fecha,
-            horaInicio: operador.horaInicio,
-            horaFin: operador.horaFin,
-        })
-
         handleShow();
+
     }
+
     const actionButtons = (rowData, tienda, operador) => {
 
 
         return (
             <div className='row'>
-                <Button icon="pi pi-pencil" severity="warning" rounded style={{ marginRight: "5px" }} tooltip="Editar" onClick={() => {
-                    updateDetallePlanificacion(rowData, tienda, operador);
-                }} />
-                {/* <Button icon="pi pi-trash" rounded severity="danger" tooltip="Eliminar" onClick={() => onDelete(rowData)} /> */}
+                <Button icon="pi pi-pencil" severity="warning" rounded style={{ marginRight: "5px" }} tooltip="Editar" onClick={() => {                    updateDetallePlanificacion(rowData, tienda, operador);                }} />
+             <Button icon="pi pi-trash" rounded severity="danger" tooltip="Eliminar" onClick={() => onDelete(rowData, tienda, operador)} /> 
             </div>
         );
     };
