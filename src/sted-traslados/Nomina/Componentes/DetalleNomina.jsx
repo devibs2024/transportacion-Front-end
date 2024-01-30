@@ -596,7 +596,10 @@ export const PantallaDetalleNomina = () => {
                         <Column field="spot" header="Spot" style={{ minWidth: '12rem', textAlign: 'center' }}></Column>
                         <Column field="banco" header="Banco" style={{ minWidth: '12rem' }}></Column>
                         <Column field="tarjeta" header="Tarjeta" style={{ minWidth: '12rem' }}></Column>
-                        <Column field="dias" header="Dias" style={{ minWidth: '12rem', textAlign: 'center' }}></Column>
+                        
+                        <Column field="dias" header="Días" style={{ minWidth: '12rem', textAlign: 'center' }}></Column>
+                        <Column field="descansos" header="Descansos" style={{ minWidth: '12rem', textAlign: 'center' }}></Column>
+                        <Column field="faltas" header="Faltas" style={{ minWidth: '12rem', textAlign: 'center' }}></Column>
 
                         <Column field="salario" header="Sueldo" body={(rowData) => strMoneda.format(rowData.salario)} style={{ minWidth: '12rem', textAlign: 'right' }}></Column>
                         <Column field="subTotal1" header="SubTotal" body={(rowData) => strMoneda.format(rowData.subTotal1)} style={{ minWidth: '12rem', textAlign: 'right' }}></Column>
