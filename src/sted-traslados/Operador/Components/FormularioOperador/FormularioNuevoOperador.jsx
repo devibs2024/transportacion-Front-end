@@ -10,6 +10,7 @@ import { rutaServidor } from '../../../../routes/rutaServidor';
 import CampoFormulario from '../../../../shared/Components/CampoFormulario/CampoFormulario';
 import { postOrPutOperador } from './operadorUtils';
 import { accionFallida } from '../../../../shared/Utils/modals';
+import API from '../../../../store/api';
 
 export const FormularioOperador = ({ setOperador, operador }) => {
 
@@ -53,7 +54,7 @@ export const FormularioOperador = ({ setOperador, operador }) => {
                 smg: location.state.operador.smg
             })
 
-          
+
 
             setIdEmpleado(location.state.operador.idEmpleado);
             setOperador({
@@ -168,9 +169,9 @@ export const FormularioOperador = ({ setOperador, operador }) => {
             telefono: Yup.string().required('Este campo es obligatorio').length(10, "La longitud debe de ser de 10 caracteres"),
             correo: Yup.string().email('Dirección de correo electrónico no válida').required('Este campo es obligatorio'),
             salario: Yup.number().typeError('El salario debe ser un número.')
-            .required('El campo salario es obligatorio'),
+                .required('El campo salario es obligatorio'),
             smg: Yup.number().typeError('El salario debe ser un número.')
-            .required('El campo salario es obligatorio')
+                .required('El campo salario es obligatorio')
         })
         ,
         onSubmit: values => {
@@ -199,9 +200,27 @@ export const FormularioOperador = ({ setOperador, operador }) => {
             };
 
             postOrPutOperador(nuevoOperador, setIdEmpleado, idEmpleado, updateOperador);
+
+            postUserAccount(nuevoOperador.correo);
+
         }
     });
 
+    const postUserAccount = async (pCorreo) => {
+
+        try {
+
+            let _User = {
+                email: pCorreo,
+            }
+
+            const response = await API.post('UserAccount/UserEmpleado', _User);
+
+        }
+        catch (er) {
+
+        }
+    }
 
     return (<Form onSubmit={formik.handleSubmit}>
         <div className='mt-3'>

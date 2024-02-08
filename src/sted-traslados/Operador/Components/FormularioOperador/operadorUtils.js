@@ -14,7 +14,7 @@ export const postOperador = async (API, operador) => {
 export const putOperador = async (API, operador) => {
   return await API.put(`Operador/${operador.idEmpleado}`, operador);
 };
-export const postOrPutOperador = async (operador, setIdEmpleado,idEmpleado, updateOperador) => {
+export const postOrPutOperador = async (operador, setIdEmpleado, idEmpleado, updateOperador) => {
   try {
     const response =
       operador.idEmpleado == 0
@@ -25,23 +25,23 @@ export const postOrPutOperador = async (operador, setIdEmpleado,idEmpleado, upda
       const actionMessage =
         operador.idEmpleado == 0
           ? {
-              titulo: "Operador Agregado",
-              mensaje: " ¡El Operador ha sido creado satisfactoriamente!",
-            }
+            titulo: "Operador Agregado",
+            mensaje: " ¡El Operador ha sido creado satisfactoriamente!",
+          }
           : {
-              titulo: "Operador Actualizado",
-              mensaje: "¡El Operador ha sido actualizado satisfactoriamente!",
-            };
+            titulo: "Operador Actualizado",
+            mensaje: "¡El Operador ha sido actualizado satisfactoriamente!",
+          };
 
       if (operador.idEmpleado == 0) {
         setIdEmpleado(response.data);
         updateOperador(createOperador(response.data, operador));
-      }else {
+      } else {
         updateOperador(createOperador(operador.idEmpleado, operador));
       }
 
       accionExitosa(actionMessage);
-      
+
     }
   } catch (e) {
     console.log(e);

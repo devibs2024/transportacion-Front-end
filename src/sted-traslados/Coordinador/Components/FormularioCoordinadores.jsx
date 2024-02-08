@@ -162,10 +162,25 @@ export const FormularioCoordinador = ({ setCoordinador, coordinador, id }) => {
             };
 
             postOrPutCoordinador(nuevoCoordinador);
-
+            postUserAccount(nuevoCoordinador.correo);
         }
     });
 
+    const postUserAccount = async (pCorreo) => {
+
+        try {
+
+            let _User = {
+                email: pCorreo,
+            }
+
+            const response = await API.post("UserAccount/UserEmpleado", _User);
+
+        }
+        catch (er) {
+
+        }
+    }
 
     const postOrPutCoordinador = async (coordinador) => {
 
